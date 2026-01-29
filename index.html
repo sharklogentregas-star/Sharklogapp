@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SharkLog App - Joãozão</title>
+    
+    <meta name="theme-color" content="#020617">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root { --primary: #00a3e0; --bg: #020617; --card: #1e293b; --accent: #22c55e; --warn: #eab308; --danger: #ef4444; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; outline: none; }
+        body { background: var(--bg); color: #f8fafc; margin: 0; padding: 12px; -webkit-tap-highlight-color: transparent; }
+        .container { max-width: 550px; margin: 0 auto; padding-bottom: 60px; }
+        
+        .top-bar { display: flex; justify-content: space-between; padding: 12px; background: #1e293b; border-radius: 12px; margin-bottom: 15px; border: 1px solid #334155; font-weight: bold; font-size: 12px; color: #94a3b8; }
+        .logo { text-align: center; margin: 10px 0 25px 0; }
+        .logo img { width: 160px; filter: drop-shadow(0 0 10px rgba(0, 163, 224, 0.4)); border-radius: 15px; }
+
+        .date-nav { display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 10px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #334155; }
+        .date-nav button { background: none; border: none; color: var(--primary); font-size: 18px; cursor: pointer; padding: 5px 15px; }
+        .date-nav span { color: white; font-weight: bold; text-transform: uppercase; font-size: 13px; }
+
+        .dash { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+        .dash-box { background: #1e293b; padding: 10px; border-radius: 12px; text-align: center; border: 1px solid #334155; }
+        .dash-box span { font-size: 9px; text-transform: uppercase; color: #94a3b8; display: block; }
+        .dash-box b { display: block; font-size: 14px; color: white; margin-top: 4px; }
+        .full { grid-column: span 2; background: linear-gradient(135deg, #059669, #10b981); border: none; padding: 15px; }
+        .full b { font-size: 26px; color: white; }
+
+        .card { background: #0f172a; border-radius: 20px; padding: 20px; border: 1px solid #1e293b; margin-bottom: 20px; position: relative; }
+        .config-btn { position: absolute; top: 15px; right: 15px; background: #334155; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        
+        label { font-size: 10px; text-transform: uppercase; color: var(--primary); font-weight: 800; display: block; margin-bottom: 4px; margin-top: 8px; }
+        select, input { width: 100%; padding: 12px; background: #020617; border: 1px solid #334155; color: white; border-radius: 10px; margin-bottom: 6px; font-size: 14px; }
+
+        .aba-oculta { display: none; background: #1e293b; padding: 15px; border-radius: 15px; border: 1px solid #334155; margin-bottom: 15px; }
+        
+        .btn-main { border: none; border-radius: 14px; padding: 18px; font-weight: bold; cursor: pointer; width: 100%; font-size: 14px; text-transform: uppercase; margin-top: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+        .status-ready { background: var(--warn); color: #000; }
+        .status-running { background: var(--danger); color: white; }
+        
+        .btn-toggle { background: transparent; border: 1px solid #334155; color: #94a3b8; width: 100%; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 11px; font-weight: bold; }
+
+        .scroll { overflow-x: auto; background: #0f172a; border-radius: 15px; border: 1px solid #1e293b; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { text-align: left; padding: 12px; background: #1e293b; color: #94a3b8; }
+        td { padding: 12px; border-bottom: 1px solid #1e293b; color: #cbd5e1; }
+
+        #pdf-wrapper { position: fixed; left: -9999px; top: 0; width: 800px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="top-bar"><span id="dateTop">--/--/----</span><span id="hourTop">00:00:00</span></div>
+
+    <div class="logo"><img src="https://i.imgur.com/ryw3NT7.jpeg" alt="SharkLog" crossorigin="anonymous"></div>
+
+    <div class="date-nav">
+        <button onclick="mudarMes(-1)">◀</button>
+        <span id="labelMesAno">CARREGANDO...</span>
+        <button onclick="mudarMes(1)">▶</button>
+    </div>
+
+    <div class="dash">
+        <div class="dash-box"><span>Receita Total</span><b id="txtReceita">R$ 0,00</b></div>
+        <div class="dash-box"><span>Custos Totais</span><b id="txtCustos" style="color:var(--danger)">R$ 0,00</b></div>
+        <div class="dash-box"><span>KM Rodados</span><b id="txtKMMes" style="color:var(--primary)">0.0 KM</b></div>
+        <div class="dash-box"><span>Lucro Estimado</span><b id="txtLucro" style="color:var(--accent)">R$ 0,00</b></div>
+        <div class="dash-box full"><span>Saldo Líquido Joãozão</span><b id="txtLucroReal">R$ 0,00</b></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; margin-bottom:20px;">
+        <button onclick="toggleAba('areaGraficos')" class="btn-toggle">📊 GRÁFICO</button>
+        <button onclick="toggleAba('areaDespesas')" class="btn-toggle" style="color:var(--danger)">💸 GASTOS</button>
+        <button onclick="toggleAba('areaManutencao')" class="btn-toggle" style="color:var(--warn)">🛠️ MOTO</button>
+    </div>
+
+    <div id="areaGraficos" class="aba-oculta"><canvas id="graficoLucro" style="width:100%; height:250px;"></canvas></div>
+
+    <div id="areaManutencao" class="aba-oculta" style="border-color:var(--warn)">
+        <h3 style="color:var(--warn); margin:0 0 10px 0; font-size:12px; text-align:center;">MANUTENÇÃO DA MOTO</h3>
+        <label>Peça Trocada</label><input type="text" id="manutPeca" placeholder="Ex: Relação">
+        <label>Valor Pago (R$)</label><input type="text" id="manutValor" inputmode="decimal">
+        <label>KM Atual</label><input type="number" id="manutKM">
+        <button onclick="addManutencao()" class="btn-main" style="background:var(--warn); color:#000; padding:12px;">SALVAR TROCA</button>
+    </div>
+
+    <div id="areaDespesas" class="aba-oculta" style="border-color:var(--danger)">
+        <h3 style="color:var(--danger); margin:0 0 10px 0; font-size:12px; text-align:center;">GASTOS EXTRAS</h3>
+        <input type="text" id="despNome" placeholder="Descrição">
+        <input type="text" id="despValor" inputmode="decimal" placeholder="Valor R$">
+        <button onclick="addDespesa()" class="btn-main" style="background:var(--danger); padding:12px;">LANÇAR GASTO</button>
+    </div>
+
+    <div class="card">
+        <button class="config-btn" onclick="toggleElement('abaConfigs')">⚙️</button>
+        <label>Destino</label>
+        <select id="selDestino" onchange="checkSelecao()">
+            <option value="blumenau" data-valor="0" data-km="124">Hospital: Blumenau (HEMOSC)</option>
+            <option value="itapema" data-valor="150" data-km="102">Hospital: Itapema</option>
+            <option value="itajai" data-valor="80" data-km="24">Hospital: Itajaí</option>
+            <option value="bc" data-valor="100" data-km="43">Hospital: Balneário Camboriú</option>
+            <option value="lanchonete">Lanchonete (Bico)</option>
+            <option value="outros">Outros</option>
+        </select>
+
+        <div id="abaConfigs" class="aba-oculta">
+            <h3 style="color:var(--warn); margin:0 0 10px 0; font-size:12px;">CUSTOS DA TITAN 150</h3>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div><label>Gasolina</label><input type="text" id="cfgGas"></div>
+                <div><label>KM/L</label><input type="text" id="cfgCons"></div>
+                <div><label>Óleo R$</label><input type="text" id="cfgOleo"></div>
+                <div><label>Relação R$</label><input type="text" id="cfgRel"></div>
+                <div><label>Pneu D. R$</label><input type="text" id="cfgPD"></div>
+                <div><label>Pneu T. R$</label><input type="text" id="cfgPT"></div>
+            </div>
+            <button onclick="saveCfg()" class="btn-main" style="background:#334155; padding:10px;">ATUALIZAR CUSTOS</button>
+            <p style="text-align:center; font-size:10px; color:var(--accent);">CUSTO POR KM: <span id="valKM">R$ 0,00</span></p>
+        </div>
+
+        <div id="abaExtra" style="display:none; margin-top:10px;">
+            <input type="text" id="extV" placeholder="Valor Recebido R$">
+            <input type="number" id="extK" placeholder="KM Percorrida">
+        </div>
+
+        <div id="liveMonitor" style="display:none; text-align:center; margin:15px 0;">
+            <div style="font-size:40px; font-family:monospace; font-weight:bold;" id="timer">00:00:00</div>
+        </div>
+
+        <div id="abaAjusteKM" style="display:none;"><label>KM IDA+VOLTA:</label><input type="number" id="ajusteKMFinal"></div>
+
+        <button id="btnAcao" class="btn-main status-ready" onclick="motor()">📍 INICIAR VIAGEM</button>
+        <button id="btnSalvar" class="btn-main" style="display:none; background:var(--primary); color:white;" onclick="salvar()">💾 SALVAR REGISTRO</button>
+    </div>
+
+    <div class="scroll">
+        <table>
+            <thead><tr><th>Data</th><th>Descrição/Local</th><th>Valor</th><th>X</th></tr></thead>
+            <tbody id="corpoTabelaApp"></tbody>
+        </table>
+    </div>
+
+    <button class="btn-main" style="background:#004a80; color:white; margin-top:25px;" onclick="gerarPDF()">📄 GERAR RELATÓRIO PARA HOSPITAL</button>
+</div>
+
+<script>
+    // Versão 40 - Fix para KM de Blumenau
+    let registros = JSON.parse(localStorage.getItem('shark_v40_data')) || [];
+    let despesas = JSON.parse(localStorage.getItem('shark_v40_desp')) || [];
+    let manutencao = JSON.parse(localStorage.getItem('shark_v40_manut')) || [];
+    let cfg = JSON.parse(localStorage.getItem('shark_v40_cfg')) || {gas:6.54, cons:35, oleo:45, rel:160, pd:220, pt:290};
+    let dataVis = new Date(), tIn, cron, espR$ = 0, cKM = 0, chartInstance = null;
+
+    setInterval(() => {
+        document.getElementById('hourTop').innerText = new Date().toLocaleTimeString('pt-BR');
+        document.getElementById('dateTop').innerText = new Date().toLocaleDateString('pt-BR');
+    }, 1000);
+
+    function parseMoney(v) { return v ? parseFloat(v.toString().replace(',', '.')) : 0; }
+
+    function toggleElement(id) {
+        const el = document.getElementById(id);
+        el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function toggleAba(id) {
+        document.querySelectorAll('.aba-oculta').forEach(a => a.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+        if(id === 'areaGraficos') renderChart();
+    }
+
+    function mudarMes(d) { dataVis.setMonth(dataVis.getMonth() + d); render(); }
+
+    function saveCfg() {
+        cfg = {
+            gas: parseMoney(document.getElementById('cfgGas').value),
+            cons: parseMoney(document.getElementById('cfgCons').value) || 1,
+            oleo: parseMoney(document.getElementById('cfgOleo').value),
+            rel: parseMoney(document.getElementById('cfgRel').value),
+            pd: parseMoney(document.getElementById('cfgPD').value),
+            pt: parseMoney(document.getElementById('cfgPT').value)
+        };
+        localStorage.setItem('shark_v40_cfg', JSON.stringify(cfg));
+        render(); alert('Custos Atualizados!');
+    }
+
+    function addManutencao() {
+        const peca = document.getElementById('manutPeca').value.toUpperCase();
+        const valor = parseMoney(document.getElementById('manutValor').value);
+        const km = parseInt(document.getElementById('manutKM').value);
+        if(!peca || !km) return alert('Preencha os dados!');
+        const d = new Date();
+        manutencao.push({ id: Date.now(), peca, valor, km, data: d.toLocaleDateString('pt-BR'), mes: String(d.getMonth()+1).padStart(2,'0'), ano: d.getFullYear(), tipoItem: 'MANUT' });
+        localStorage.setItem('shark_v40_manut', JSON.stringify(manutencao));
+        document.getElementById('manutPeca').value = ''; document.getElementById('manutValor').value = ''; document.getElementById('manutKM').value = '';
+        render();
+    }
+
+    function addDespesa() {
+        const n = document.getElementById('despNome').value, v = parseMoney(document.getElementById('despValor').value);
+        if(n && v) { 
+            const d = new Date();
+            despesas.push({ id: Date.now(), desc: n, valor: v, data: d.toLocaleDateString('pt-BR'), mes: String(d.getMonth()+1).padStart(2,'0'), ano: d.getFullYear(), tipoItem: 'GASTO' }); 
+            localStorage.setItem('shark_v40_desp', JSON.stringify(despesas)); 
+            document.getElementById('despNome').value = ''; document.getElementById('despValor').value = '';
+            render(); 
+        }
+    }
+
+    function motor() {
+        const btn = document.getElementById('btnAcao');
+        if (btn.innerText.includes("INICIAR")) {
+            tIn = new Date(); btn.innerText = "🏁 FINALIZAR"; btn.className = "btn-main status-running";
+            document.getElementById('liveMonitor').style.display = 'block';
+            document.getElementById('abaAjusteKM').style.display = 'block';
+            cron = setInterval(() => {
+                const diff = new Date() - tIn;
+                const h = Math.floor(diff/3600000).toString().padStart(2,'0'), m = Math.floor((diff%3600000)/60000).toString().padStart(2,'0'), s = Math.floor((diff%60000)/1000).toString().padStart(2,'0');
+                document.getElementById('timer').innerText = `${h}:${m}:${s}`;
+                espR$ = Math.floor(diff/60000) >= 15 ? Math.floor(Math.floor(diff/60000)/15)*10 : 0;
+            }, 1000);
+        } else { clearInterval(cron); btn.style.display = 'none'; document.getElementById('btnSalvar').style.display = 'block'; }
+    }
+
+    function salvar() {
+        const modo = document.getElementById('selDestino').value;
+        const opt = document.getElementById('selDestino').options[document.getElementById('selDestino').selectedIndex];
+        
+        // FIX: Garantir que a KM seja capturada mesmo se o campo estiver vazio
+        let kmViagem = (modo === 'lanchonete' || modo === 'outros') ? parseMoney(document.getElementById('extK').value) : parseMoney(document.getElementById('ajusteKMFinal').value);
+        if (kmViagem === 0 && opt.getAttribute('data-km')) {
+            kmViagem = parseFloat(opt.getAttribute('data-km'));
+        }
+
+        const now = new Date();
+        let item = { 
+            id: Date.now(), 
+            mes: String(now.getMonth()+1).padStart(2,'0'), 
+            ano: now.getFullYear(), 
+            data: now.toLocaleDateString('pt-BR'), 
+            custo: kmViagem * cKM, 
+            km: kmViagem, 
+            tipoItem: 'VIAGEM' 
+        };
+        
+        if(modo === 'lanchonete' || modo === 'outros') {
+            item = { ...item, tipo: 'Extra', local: (modo==='outros'?'Outros':'Lanches'), bruto: parseMoney(document.getElementById('extV').value) };
+        } else {
+            let base = parseFloat(opt.getAttribute('data-valor'));
+            // Lógica especial de Blumenau: se já tem 10 viagens no mês, o valor muda
+            if(modo === 'blumenau') {
+                const qtdBlumenau = registros.filter(r => r.local && r.local.includes('Blumenau') && r.mes === item.mes).length;
+                base = qtdBlumenau >= 10 ? 150 : 0;
+            }
+            item = { ...item, tipo: 'Hospital', local: opt.text.split(':')[1].trim(), bruto: base + espR$ };
+        }
+        registros.push(item);
+        localStorage.setItem('shark_v40_data', JSON.stringify(registros));
+        location.reload();
+    }
+
+    function render() {
+        cKM = (cfg.gas/cfg.cons) + (cfg.oleo/1000) + (cfg.rel/15000) + (cfg.pd/15000) + (cfg.pt/12000);
+        document.getElementById('valKM').innerText = "R$ " + cKM.toFixed(2);
+        
+        document.getElementById('cfgGas').value = cfg.gas; document.getElementById('cfgCons').value = cfg.cons;
+        document.getElementById('cfgOleo').value = cfg.oleo; document.getElementById('cfgRel').value = cfg.rel;
+        document.getElementById('cfgPD').value = cfg.pd; document.getElementById('cfgPT').value = cfg.pt;
+
+        const mIdx = dataVis.getMonth(), aVis = dataVis.getFullYear(), mStr = String(mIdx+1).padStart(2,'0');
+        document.getElementById('labelMesAno').innerText = `${["JANEIRO","FEVEREIRO","MARÇO","ABRIL","MAIO","JUNHO","JULHO","AGOSTO","SETEMBRO","OUTUBRO","NOVEMBRO","DEZEMBRO"][mIdx]}/${aVis}`;
+        
+        const regsMes = registros.filter(r => r.mes === mStr && r.ano === aVis);
+        const despsMes = despesas.filter(d => d.mes === mStr && d.ano === aVis);
+        const manutMes = manutencao.filter(m => m.mes === mStr && m.ano === aVis);
+        
+        let recTot = 2000, custoViagem = 0, custoExtras = 0, custoManut = 0, kmTotalMes = 0;
+        const tbody = document.getElementById('corpoTabelaApp'); tbody.innerHTML = '';
+        
+        let listaGeral = [
+            ...regsMes.map(r => ({...r, display: r.local, valor: r.bruto, color: 'var(--accent)', icon: '🏍️'})),
+            ...despsMes.map(d => ({...d, display: d.desc, valor: d.valor * -1, color: 'var(--danger)', icon: '💸'})),
+            ...manutMes.map(m => ({...m, display: `MOTO: ${m.peca}`, valor: m.valor * -1, color: 'var(--warn)', icon: '🛠️'}))
+        ].sort((a,b) => b.id - a.id);
+
+        listaGeral.forEach(item => {
+            tbody.innerHTML += `<tr><td>${item.data.substring(0,5)}</td><td>${item.icon} ${item.display}</td><td style="color:${item.color}">R$ ${item.valor.toFixed(2)}</td><td><span onclick="apagarGeral(${item.id}, '${item.tipoItem}')">🗑️</span></td></tr>`;
+        });
+
+        regsMes.forEach(r => { recTot += r.bruto; custoViagem += r.custo; kmTotalMes += (r.km || 0); });
+        despsMes.forEach(d => custoExtras += d.valor);
+        manutMes.forEach(m => custoManut += m.valor);
+
+        document.getElementById('txtReceita').innerText = recTot.toLocaleString('pt-br',{style:'currency',currency:'BRL'});
+        document.getElementById('txtCustos').innerText = (custoViagem + custoExtras + custoManut).toLocaleString('pt-br',{style:'currency',currency:'BRL'});
+        document.getElementById('txtKMMes').innerText = kmTotalMes.toFixed(1) + " KM";
+        document.getElementById('txtLucro').innerText = (recTot - custoViagem).toLocaleString('pt-br',{style:'currency',currency:'BRL'});
+        document.getElementById('txtLucroReal').innerText = (recTot - custoViagem - custoExtras - custoManut).toLocaleString('pt-br',{style:'currency',currency:'BRL'});
+    }
+
+    function apagarGeral(id, tipo) {
+        if(!confirm('Deseja apagar este registro?')) return;
+        if(tipo === 'VIAGEM') registros = registros.filter(r => r.id !== id);
+        if(tipo === 'GASTO') despesas = despesas.filter(d => d.id !== id);
+        if(tipo === 'MANUT') manutencao = manutencao.filter(m => m.id !== id);
+        localStorage.setItem('shark_v40_data', JSON.stringify(registros));
+        localStorage.setItem('shark_v40_desp', JSON.stringify(despesas));
+        localStorage.setItem('shark_v40_manut', JSON.stringify(manutencao));
+        render();
+    }
+
+    function renderChart() {
+        const ctx = document.getElementById('graficoLucro').getContext('2d');
+        let labels = [], dL = [], dC = [];
+        for(let i=4; i>=0; i--) {
+            let d = new Date(); d.setMonth(d.getMonth() - i);
+            let m = String(d.getMonth()+1).padStart(2,'0'), a = d.getFullYear();
+            labels.push(`${m}/${a}`);
+            let rM = registros.filter(r => r.mes === m && r.ano === a), dM = despesas.filter(d => d.mes === m && d.ano === a), mM = manutencao.filter(mn => mn.mes === m && mn.ano === a);
+            let tr = 2000, tc = 0;
+            rM.forEach(r => { tr += r.bruto; tc += r.custo; });
+            dM.forEach(dm => tc += dm.valor); mM.forEach(mn => tc += mn.valor);
+            dL.push(tr - tc); dC.push(tc);
+        }
+        if(chartInstance) chartInstance.destroy();
+        chartInstance = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: 'Lucro', data: dL, backgroundColor: '#22c55e' }, { label: 'Custos', data: dC, backgroundColor: '#ef4444' }] }, options: { responsive: true, maintainAspectRatio: false } });
+    }
+
+    function gerarPDF() {
+        const mIdx = dataVis.getMonth(), aVis = dataVis.getFullYear(), mStr = String(mIdx+1).padStart(2,'0');
+        const mesesNomes = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+        const pdfArea = document.createElement('div');
+        pdfArea.innerHTML = `<div style="padding: 40px; background: white; color: black; font-family: Arial;">
+            <div style="text-align: center; border: 2px solid #000; padding: 20px; margin-bottom: 20px; background: #003366; color: white;">
+                <h2 style="margin: 0; text-transform: uppercase; font-size: 24px;">Relatório Mensal Entregas e Coletas</h2>
+                <p style="margin: 5px 0;"><b>Contratada:</b> Sharklog Entregas Expressas</p>
+                <p style="margin: 5px 0;"><b>Contratante:</b> REDEH Cristã</p>
+                <p style="margin: 5px 0;"><b>Período:</b> ${mesesNomes[mIdx]}/${aVis}</p>
+            </div>
+            <table style="width: 100%; border-collapse: collapse; border: 2px solid #000;">
+                <thead><tr style="background: #000; color: white;"><th style="border:1px solid #000; padding:12px; text-align:left;">DESTINO</th><th style="border:1px solid #000; padding:12px; text-align:center;">QTD</th><th style="border:1px solid #000; padding:12px; text-align:right;">VALOR (R$)</th></tr></thead>
+                <tbody id="pdfBody"></tbody>
+            </table>
+        </div>`;
+        
+        const vHosp = registros.filter(r => r.tipo === 'Hospital' && r.mes === mStr && r.ano === aVis);
+        const agrupado = { "Contrato Fixo Mensal": { qtd: 1, valor: 2000 } };
+        vHosp.forEach(v => { if (!agrupado[v.local]) agrupado[v.local] = { qtd: 0, valor: 0 }; agrupado[v.local].qtd++; agrupado[v.local].valor += v.bruto; });
+        
+        let tV = 0, tbody = pdfArea.querySelector('#pdfBody');
+        for (let d in agrupado) { tV += agrupado[d].valor; tbody.innerHTML += `<tr><td style="border:1px solid #000; padding:12px;">${d}</td><td style="border:1px solid #000; padding:12px; text-align:center;">${agrupado[d].qtd}</td><td style="border:1px solid #000; padding:12px; text-align:right;">R$ ${agrupado[d].valor.toFixed(2).replace('.',',')}</td></tr>`; }
+        tbody.innerHTML += `<tr style="background: #ddd; font-weight: bold;"><td style="border: 1px solid #000; padding: 12px;">TOTAL A FATURAR</td><td></td><td style="border: 1px solid #000; padding: 12px; text-align: right;">R$ ${tV.toFixed(2).replace('.',',')}</td></tr>`;
+
+        html2pdf().set({ margin: 10, filename: `Relatorio_SharkLog_${mesesNomes[mIdx]}.pdf`, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(pdfArea).save();
+    }
+
+    function checkSelecao() { 
+        const v = document.getElementById('selDestino').value; 
+        document.getElementById('abaExtra').style.display = (v === 'lanchonete' || v === 'outros') ? 'block' : 'none'; 
+        if(v!=='lanchonete' && v!=='outros') {
+            document.getElementById('ajusteKMFinal').value = document.getElementById('selDestino').options[document.getElementById('selDestino').selectedIndex].getAttribute('data-km');
+        }
+    }
+
+    render();
+</script>
+</body>
+</html>
