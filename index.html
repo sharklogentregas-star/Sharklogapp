@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SharkLog Pro - Joãozão</title>
+    <title>SharkLog Ultimate - Joãozão</title>
     
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,186 +15,193 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        /* --- DESIGN SYSTEM SHARKLOG PRO --- */
+        /* --- DESIGN SYSTEM ULTIMATE --- */
         :root {
-            --bg-body: #0f172a; /* Azul Profundo */
-            --bg-card: #1e293b; /* Azul Petróleo */
-            --primary: #0ea5e9; /* Azul Neon */
-            --accent: #10b981; /* Verde Sucesso */
-            --danger: #ef4444; /* Vermelho Erro */
-            --glass: rgba(30, 41, 59, 0.7);
-            --border: 1px solid rgba(255, 255, 255, 0.1);
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --primary: #38bdf8; /* Azul Céu Vibrante */
+            --accent: #34d399; /* Verde Menta */
+            --warn: #fbbf24;    /* Amarelo Solar */
+            --danger: #f87171;  /* Vermelho Suave */
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: 1px solid rgba(255, 255, 255, 0.08);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            --glass: rgba(30, 41, 59, 0.8);
         }
 
-        * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; outline: none; }
+        * { box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; outline: none; }
         
         body {
             background-color: var(--bg-body);
-            background-image: radial-gradient(circle at top, #1e293b 0%, #0f172a 100%);
-            color: #f1f5f9;
-            margin: 0; padding: 15px;
+            background-image: radial-gradient(circle at top right, #1e293b 0%, #0f172a 60%);
+            color: var(--text-main);
+            margin: 0; padding: 12px;
             min-height: 100vh;
+            font-size: 14px;
         }
 
-        .container { max-width: 600px; margin: 0 auto; padding-bottom: 90px; }
+        .container { max-width: 600px; margin: 0 auto; padding-bottom: 100px; }
 
-        /* HEADER ANIMADO */
-        .header-area {
+        /* HEADER */
+        .header {
             display: flex; align-items: center; justify-content: space-between;
-            background: var(--glass); backdrop-filter: blur(10px);
-            padding: 15px; border-radius: 20px; border: var(--border);
+            background: var(--glass); backdrop-filter: blur(12px);
+            padding: 16px; border-radius: 20px; border: var(--border);
             margin-bottom: 20px; box-shadow: var(--shadow);
         }
-        .header-info h1 { margin: 0; font-size: 18px; background: linear-gradient(90deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
-        .header-info p { margin: 0; font-size: 12px; color: #94a3b8; letter-spacing: 1px; }
-        .logo-img { width: 50px; height: 50px; border-radius: 12px; border: 2px solid var(--primary); box-shadow: 0 0 15px rgba(14, 165, 233, 0.3); }
+        .header h1 { margin: 0; font-size: 20px; font-weight: 800; background: linear-gradient(to right, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header p { margin: 0; font-size: 11px; color: var(--text-muted); letter-spacing: 0.5px; }
+        .logo-img { width: 48px; height: 48px; border-radius: 12px; border: 2px solid rgba(56, 189, 248, 0.3); }
 
-        /* NAV MESES */
+        /* NAVEGAÇÃO DATA */
         .date-nav {
             display: flex; justify-content: space-between; align-items: center;
-            background: var(--bg-card); padding: 12px; border-radius: 16px;
+            background: var(--bg-card); padding: 8px 12px; border-radius: 16px;
             margin-bottom: 20px; border: var(--border);
         }
-        .nav-btn { background: none; border: none; color: var(--primary); font-size: 20px; padding: 5px 15px; cursor: pointer; transition: 0.2s; }
-        .nav-btn:active { transform: scale(0.8); }
-        #labelMesAno { font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        .nav-btn { background: none; border: none; color: var(--primary); font-size: 22px; padding: 5px 15px; cursor: pointer; }
+        #labelMesAno { font-weight: 700; font-size: 14px; text-transform: uppercase; color: white; }
 
-        /* DASHBOARD GRID */
-        .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        /* KPI CARDS */
+        .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 25px; }
         .kpi-card {
-            background: linear-gradient(145deg, #1e293b, #172033);
-            padding: 15px; border-radius: 18px; text-align: center;
-            border: var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            position: relative; overflow: hidden;
+            background: linear-gradient(160deg, #1e293b, #0f172a);
+            padding: 16px; border-radius: 18px; text-align: center;
+            border: var(--border); position: relative; overflow: hidden;
+            box-shadow: var(--shadow);
         }
-        .kpi-card::before { content:''; position: absolute; top:0; left:0; width: 100%; height: 4px; background: var(--color); }
-        .kpi-label { font-size: 10px; text-transform: uppercase; color: #94a3b8; font-weight: 600; margin-bottom: 5px; display: block; }
-        .kpi-value { font-size: 18px; font-weight: 800; color: #fff; display: block; }
-        .full-width { grid-column: span 2; background: linear-gradient(135deg, var(--accent), #059669); }
+        .kpi-card::after { content:''; position: absolute; top:0; left:0; width:4px; height:100%; background: var(--c); }
+        .kpi-lbl { font-size: 10px; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 4px; font-weight: 600; }
+        .kpi-val { font-size: 18px; font-weight: 800; color: #fff; }
+        .full-w { grid-column: span 2; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 78, 59, 0.4)); border: 1px solid var(--accent); }
 
-        /* BOTÕES DE ABA */
-        .tab-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px; background: #172033; padding: 5px; border-radius: 16px; }
-        .tab-btn {
-            background: transparent; border: none; color: #94a3b8; padding: 10px;
-            font-size: 11px; font-weight: bold; border-radius: 12px; cursor: pointer;
-        }
-        .tab-btn.active { background: #334155; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        /* TABS */
+        .tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 14px; }
+        .tab { background: transparent; border: none; color: var(--text-muted); padding: 12px; font-size: 11px; font-weight: 700; border-radius: 10px; cursor: pointer; transition: 0.3s; }
+        .tab.active { background: #334155; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
-        /* ÁREAS OCULTAS */
-        .aba-conteudo { display: none; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* AREAS */
+        .area { display: none; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* FORMULÁRIOS E INPUTS */
-        .main-card {
-            background: var(--glass); backdrop-filter: blur(10px);
-            border-radius: 24px; padding: 20px; border: var(--border);
-            margin-bottom: 25px; position: relative;
-        }
-        label { font-size: 11px; color: var(--primary); font-weight: 700; margin-bottom: 5px; display: block; text-transform: uppercase; }
+        /* INPUTS */
+        .box-input { background: var(--bg-card); padding: 20px; border-radius: 20px; border: var(--border); margin-bottom: 20px; }
+        label { font-size: 11px; color: var(--primary); font-weight: 700; display: block; margin-bottom: 6px; text-transform: uppercase; }
         input, select {
-            width: 100%; padding: 14px; background: #0f172a; border: 1px solid #334155;
-            color: white; border-radius: 12px; font-size: 15px; margin-bottom: 12px;
-            transition: 0.3s;
+            width: 100%; padding: 16px; background: #0b1120; border: 1px solid #334155;
+            color: white; border-radius: 12px; font-size: 16px; margin-bottom: 12px;
+            transition: border 0.3s;
         }
-        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2); }
+        input:focus, select:focus { border-color: var(--primary); }
 
-        /* BOTÕES DE AÇÃO */
-        .btn-action {
-            width: 100%; padding: 16px; border: none; border-radius: 16px;
-            font-weight: 800; text-transform: uppercase; letter-spacing: 1px; font-size: 13px;
-            cursor: pointer; transition: transform 0.1s, box-shadow 0.2s;
-            margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px;
-            color: white; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        /* BUTTONS */
+        .btn {
+            width: 100%; padding: 16px; border: none; border-radius: 14px;
+            font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+            cursor: pointer; color: white; margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: transform 0.1s;
         }
-        .btn-action:active { transform: scale(0.96); }
-        .btn-start { background: linear-gradient(135deg, var(--warn), #ca8a04); color: #000; }
-        .btn-stop { background: linear-gradient(135deg, var(--danger), #b91c1c); }
-        .btn-save { background: linear-gradient(135deg, var(--primary), #0284c7); }
-        .btn-excel { background: linear-gradient(135deg, #10b981, #059669); }
-        .btn-config { position: absolute; top: 20px; right: 20px; background: #334155; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; font-size: 18px; }
+        .btn:active { transform: scale(0.97); }
+        .btn-ok { background: linear-gradient(135deg, var(--primary), #0284c7); }
+        .btn-warn { background: linear-gradient(135deg, var(--warn), #d97706); color: #000; }
+        .btn-dang { background: linear-gradient(135deg, var(--danger), #b91c1c); }
+        .btn-xls { background: linear-gradient(135deg, var(--accent), #047857); }
+        .btn-cfg { position: absolute; top: 15px; right: 15px; background: #334155; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border:none; font-size: 20px; cursor: pointer; color: white; }
 
         /* TABELA */
-        .table-container { overflow-x: auto; border-radius: 16px; border: var(--border); background: #172033; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th { text-align: left; padding: 15px; background: #1e293b; color: #94a3b8; font-size: 11px; text-transform: uppercase; }
-        td { padding: 15px; border-bottom: 1px solid #334155; color: #e2e8f0; }
+        .tabela-wrapper { overflow-x: auto; border-radius: 16px; border: var(--border); background: var(--bg-card); box-shadow: var(--shadow); }
+        table { width: 100%; border-collapse: collapse; min-width: 100%; }
+        th { text-align: left; padding: 16px; background: rgba(0,0,0,0.2); color: var(--text-muted); font-size: 10px; text-transform: uppercase; font-weight: 700; }
+        td { padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #e2e8f0; font-size: 13px; }
         tr:last-child td { border-bottom: none; }
-        .btn-icon { background: none; border: none; font-size: 16px; cursor: pointer; padding: 5px; }
+        .btn-icon { background: none; border: none; font-size: 16px; cursor: pointer; padding: 5px; opacity: 0.7; transition: 0.2s; }
+        .btn-icon:hover { opacity: 1; transform: scale(1.1); }
 
         /* MODAL */
-        #modalEdicao { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 999; justify-content: center; align-items: center; }
-        .modal-box { background: #1e293b; padding: 25px; border-radius: 20px; width: 90%; max-width: 400px; border: 1px solid var(--primary); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+        .modal-body { background: #1e293b; padding: 25px; border-radius: 24px; width: 90%; max-width: 380px; border: 1px solid var(--primary); }
+
+        /* Chart Fix */
+        .chart-container { position: relative; height: 250px; width: 100%; }
     </style>
 </head>
 <body>
 
 <div class="container">
     
-    <div class="header-area">
-        <div class="header-info">
-            <h1>SHARKLOG PRO</h1>
-            <p id="dataTopo">--/--/----</p>
+    <div class="header">
+        <div>
+            <h1>SHARKLOG</h1>
+            <p id="clock">CARREGANDO...</p>
         </div>
         <img src="https://i.imgur.com/ryw3NT7.jpeg" class="logo-img" alt="Logo">
     </div>
 
     <div class="date-nav">
         <button class="nav-btn" onclick="mudarMes(-1)">❮</button>
-        <span id="labelMesAno">CARREGANDO...</span>
+        <span id="labelMesAno">--/--</span>
         <button class="nav-btn" onclick="mudarMes(1)">❯</button>
     </div>
 
     <div class="dash-grid">
-        <div class="kpi-card" style="--color: var(--primary)">
-            <span class="kpi-label">Receita</span>
-            <span class="kpi-value" id="txtReceita">R$ 0,00</span>
+        <div class="kpi-card" style="--c: var(--primary)">
+            <span class="kpi-lbl">Receita</span>
+            <span class="kpi-val" id="txtReceita">R$ 0,00</span>
         </div>
-        <div class="kpi-card" style="--color: var(--danger)">
-            <span class="kpi-label">Custos</span>
-            <span class="kpi-value" id="txtCustos">R$ 0,00</span>
+        <div class="kpi-card" style="--c: var(--danger)">
+            <span class="kpi-lbl">Custos</span>
+            <span class="kpi-val" id="txtCustos">R$ 0,00</span>
         </div>
-        <div class="kpi-card" style="--color: #a855f7">
-            <span class="kpi-label">KM Mês</span>
-            <span class="kpi-value" id="txtKMMes">0.0 KM</span>
+        <div class="kpi-card" style="--c: #a855f7">
+            <span class="kpi-lbl">KM Mês</span>
+            <span class="kpi-val" id="txtKMMes">0 KM</span>
         </div>
-        <div class="kpi-card" style="--color: var(--accent)">
-            <span class="kpi-label">Lucro Est.</span>
-            <span class="kpi-value" id="txtLucro">R$ 0,00</span>
+        <div class="kpi-card" style="--c: var(--warn)">
+            <span class="kpi-lbl">Lucro Previsto</span>
+            <span class="kpi-val" id="txtLucro">R$ 0,00</span>
         </div>
-        <div class="kpi-card full-width" style="--color: #fff">
-            <span class="kpi-label" style="color:#d1fae5">SALDO LÍQUIDO JOÃOZÃO</span>
-            <span class="kpi-value" style="font-size:24px" id="txtLucroReal">R$ 0,00</span>
+        <div class="kpi-card full-w" style="--c: #fff">
+            <span class="kpi-lbl" style="color: var(--accent)">LUCRO LÍQUIDO REAL</span>
+            <span class="kpi-val" style="font-size: 26px;" id="txtLucroReal">R$ 0,00</span>
         </div>
     </div>
 
-    <div class="tab-bar">
-        <button class="tab-btn" onclick="toggleAba('areaGraficos', this)">📊 GRÁFICO</button>
-        <button class="tab-btn" onclick="toggleAba('areaDespesas', this)">💸 GASTOS</button>
-        <button class="tab-btn" onclick="toggleAba('areaManutencao', this)">🛠️ MOTO</button>
+    <div class="tabs">
+        <button class="tab" onclick="abrirAba('areaGraficos', this)">📈 GRÁFICO</button>
+        <button class="tab" onclick="abrirAba('areaDespesas', this)">💸 GASTOS</button>
+        <button class="tab" onclick="abrirAba('areaManutencao', this)">🛠️ MOTO</button>
     </div>
 
-    <div id="areaGraficos" class="aba-conteudo"><canvas id="graficoLucro" style="width:100%; height:220px; margin-bottom:20px;"></canvas></div>
-
-    <div id="areaDespesas" class="aba-conteudo main-card" style="border-color:var(--danger)">
-        <h3 style="margin-top:0; color:var(--danger); text-align:center;">LANÇAR GASTO EXTRA</h3>
-        <input type="text" id="despNome" placeholder="Descrição (ex: Lanche)">
-        <input type="text" id="despValor" inputmode="decimal" placeholder="Valor (R$)">
-        <button onclick="addDespesa()" class="btn-action" style="background:var(--danger)">REGISTRAR GASTO</button>
+    <div id="areaGraficos" class="area">
+        <div class="box-input chart-container">
+            <canvas id="graficoLucro"></canvas>
+        </div>
     </div>
 
-    <div id="areaManutencao" class="aba-conteudo main-card" style="border-color:var(--warn)">
-        <h3 style="margin-top:0; color:var(--warn); text-align:center;">MANUTENÇÃO MOTO</h3>
-        <input type="text" id="manutPeca" placeholder="Peça (ex: Óleo)">
-        <input type="text" id="manutValor" inputmode="decimal" placeholder="Valor (R$)">
-        <input type="number" id="manutKM" placeholder="KM Atual">
-        <button onclick="addManutencao()" class="btn-action" style="background:var(--warn); color:black;">SALVAR MANUTENÇÃO</button>
+    <div id="areaDespesas" class="area">
+        <div class="box-input" style="border-color: var(--danger)">
+            <h3 style="margin-top:0; color:var(--danger); text-align:center;">NOVA DESPESA</h3>
+            <input type="text" id="despNome" placeholder="O que comprou?">
+            <input type="text" id="despValor" inputmode="decimal" placeholder="Valor (R$)">
+            <button onclick="addDespesa()" class="btn btn-dang">LANÇAR GASTO</button>
+        </div>
     </div>
 
-    <div class="main-card">
-        <button class="btn-config" onclick="toggleElement('abaConfigs')">⚙️</button>
+    <div id="areaManutencao" class="area">
+        <div class="box-input" style="border-color: var(--warn)">
+            <h3 style="margin-top:0; color:var(--warn); text-align:center;">MANUTENÇÃO</h3>
+            <input type="text" id="manutPeca" placeholder="Peça (Ex: Óleo, Relação)">
+            <input type="text" id="manutValor" inputmode="decimal" placeholder="Valor Pago (R$)">
+            <input type="number" id="manutKM" placeholder="KM Atual do Painel">
+            <button onclick="addManutencao()" class="btn btn-warn">REGISTRAR TROCA</button>
+        </div>
+    </div>
+
+    <div class="box-input" style="position:relative;">
+        <button class="btn-cfg" onclick="toggleConfig()">⚙️</button>
         
-        <label>Selecione o Destino</label>
+        <label>DESTINO DA VIAGEM</label>
         <select id="selDestino" onchange="checkSelecao()">
             <option value="blumenau" data-valor="0" data-km="124">Hospital: Blumenau (HEMOSC)</option>
             <option value="itapema" data-valor="150" data-km="102">Hospital: Itapema</option>
@@ -204,74 +211,72 @@
             <option value="outros">Outros</option>
         </select>
 
-        <div id="abaConfigs" style="display:none; margin-bottom:15px; background:#334155; padding:10px; border-radius:10px;">
-            <h4 style="margin:0 0 10px 0; color:var(--warn); text-align:center;">CUSTOS DA TITAN 150</h4>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-                <div><label>Gasolina</label><input type="text" id="cfgGas"></div>
-                <div><label>KM/L</label><input type="text" id="cfgCons"></div>
+        <div id="abaConfigs" style="display:none; background:#0f172a; padding:15px; border-radius:15px; margin-bottom:15px; border:1px solid #334155;">
+            <h4 style="margin:0 0 10px 0; color:var(--warn); text-align:center;">CONFIGURAÇÃO DE CUSTOS</h4>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div><label>Gasolina R$</label><input type="text" id="cfgGas"></div>
+                <div><label>KM por Litro</label><input type="text" id="cfgCons"></div>
                 <div><label>Óleo R$</label><input type="text" id="cfgOleo"></div>
                 <div><label>Relação R$</label><input type="text" id="cfgRel"></div>
-                <div><label>Pneu D.</label><input type="text" id="cfgPD"></div>
-                <div><label>Pneu T.</label><input type="text" id="cfgPT"></div>
+                <div><label>Pneu Diant.</label><input type="text" id="cfgPD"></div>
+                <div><label>Pneu Tras.</label><input type="text" id="cfgPT"></div>
             </div>
-            <button onclick="saveCfg()" class="btn-action" style="padding:10px; font-size:11px;">SALVAR CUSTOS</button>
-            <p style="text-align:center; font-size:10px; margin-top:5px; color:var(--accent);">CUSTO POR KM: <span id="valKM">R$ 0,00</span></p>
+            <button onclick="saveCfg()" class="btn btn-ok" style="padding:10px; font-size:12px;">SALVAR CUSTOS</button>
+            <p style="text-align:center; font-size:11px; margin-top:5px; color:var(--accent);">CUSTO POR KM: <span id="valKM">R$ 0,00</span></p>
         </div>
 
         <div id="abaExtra" style="display:none;">
-            <label>Valor Recebido</label><input type="text" id="extV" placeholder="R$ 0,00">
-            <label>KM Percorrida</label><input type="number" id="extK" placeholder="0 KM">
+            <label>Valor Cobrado (R$)</label><input type="text" id="extV">
+            <label>KM Total Percorrida</label><input type="number" id="extK">
         </div>
 
         <div id="liveMonitor" style="display:none; text-align:center; margin:20px 0;">
-            <div style="font-size:48px; font-family:monospace; font-weight:800; color:white; text-shadow: 0 0 10px var(--primary);" id="timer">00:00:00</div>
-            <p style="color:#94a3b8; font-size:12px;">VIAGEM EM ANDAMENTO...</p>
+            <div style="font-size:42px; font-family:monospace; font-weight:800; color:white; text-shadow:0 0 15px var(--primary);" id="timer">00:00:00</div>
+            <p style="color:var(--text-muted); font-size:12px; margin:0;">CORRIDA EM ANDAMENTO</p>
         </div>
 
         <div id="abaAjusteKM" style="display:none;">
-            <label>KM Total da Viagem (Ida + Volta)</label>
+            <label style="color:var(--warn);">KM TOTAL (IDA + VOLTA)</label>
             <input type="number" id="ajusteKMFinal" style="border-color:var(--warn);">
         </div>
 
-        <button id="btnAcao" class="btn-action btn-start" onclick="motor()">🚀 INICIAR CORRIDA</button>
-        <button id="btnSalvar" class="btn-action btn-save" style="display:none;" onclick="salvar()">💾 SALVAR NO SISTEMA</button>
+        <button id="btnAcao" class="btn btn-ok" onclick="motor()">🚀 INICIAR CORRIDA</button>
+        <button id="btnSalvar" class="btn btn-ok" style="display:none; background: linear-gradient(135deg, var(--accent), #047857);" onclick="salvar()">💾 SALVAR REGISTRO</button>
     </div>
 
-    <div class="table-container">
+    <div class="tabela-wrapper">
         <table>
-            <thead><tr><th>Data/Hora</th><th>Local</th><th>Valor</th><th style="text-align:right;">Ações</th></tr></thead>
+            <thead><tr><th>Data/Local</th><th>Detalhes</th><th>Valor</th><th style="text-align:right;">Opções</th></tr></thead>
             <tbody id="corpoTabelaApp"></tbody>
         </table>
     </div>
 
     <div style="margin-top:25px;">
-        <button class="btn-action btn-excel" onclick="gerarCSVHospital()">📄 EXCEL HOSPITAL (MODELO NOVO)</button>
-        <button class="btn-action" style="background:#334155; margin-top:10px;" onclick="gerarCSVContabil()">📈 EXCEL CONTÁBIL (DETALHADO)</button>
+        <button class="btn btn-xls" onclick="gerarCSVHospital()">📄 RELATÓRIO HOSPITAL (MODELO OFICIAL)</button>
+        <button class="btn" style="background:#334155; margin-top:10px;" onclick="gerarCSVContabil()">📈 RELATÓRIO FINANCEIRO (COMPLETO)</button>
     </div>
 
-    <div style="display:flex; gap:10px; margin-top:20px; justify-content:center;">
-        <button onclick="exportarBackup()" style="background:none; border:1px solid var(--accent); color:var(--accent); padding:10px 20px; border-radius:10px;">⬇️ BACKUP</button>
-        <button onclick="importarBackup()" style="background:none; border:1px solid var(--warn); color:var(--warn); padding:10px 20px; border-radius:10px;">⬆️ RESTAURAR</button>
+    <div style="display:flex; gap:10px; margin-top:30px; justify-content:center;">
+        <button onclick="exportarBackup()" style="background:none; border:1px solid var(--primary); color:var(--primary); padding:10px 20px; border-radius:10px; font-size:12px; font-weight:bold;">⬇️ BACKUP</button>
+        <button onclick="importarBackup()" style="background:none; border:1px solid var(--warn); color:var(--warn); padding:10px 20px; border-radius:10px; font-size:12px; font-weight:bold;">⬆️ RESTAURAR</button>
     </div>
-
 </div>
 
-<div id="modalEdicao">
-    <div class="modal-box">
+<div id="modal">
+    <div class="modal-body">
         <h3 style="color:var(--primary); margin-top:0; text-align:center;">EDITAR REGISTRO</h3>
         <input type="hidden" id="editId">
         <label>Data</label><input type="date" id="editData">
-        <label>Local / Descrição</label><input type="text" id="editLocal">
+        <label>Descrição / Local</label><input type="text" id="editLocal">
         <label>Valor (R$)</label><input type="text" id="editValor">
-        <label>KM Rodado</label><input type="number" id="editKM">
-        <button onclick="salvarEdicao()" class="btn-action btn-save">SALVAR ALTERAÇÕES</button>
-        <button onclick="fecharModal()" class="btn-action btn-stop" style="margin-top:10px;">CANCELAR</button>
+        <div id="divEditKM"><label>KM Total</label><input type="number" id="editKM"></div>
+        <button onclick="salvarEdicao()" class="btn btn-ok">SALVAR</button>
+        <button onclick="fecharModal()" class="btn btn-dang" style="margin-top:10px;">CANCELAR</button>
     </div>
 </div>
 
 <script>
-    // Versão 45 - SharkLog Pro Design + Modelo DOCX
-    // Tenta carregar dados da v45 ou v43 (migração automática)
+    // --- SETUP V46 ULTIMATE ---
     let registros = JSON.parse(localStorage.getItem('shark_v45_data')) || JSON.parse(localStorage.getItem('shark_v43_data')) || [];
     let despesas = JSON.parse(localStorage.getItem('shark_v45_desp')) || JSON.parse(localStorage.getItem('shark_v43_desp')) || [];
     let manutencao = JSON.parse(localStorage.getItem('shark_v45_manut')) || JSON.parse(localStorage.getItem('shark_v43_manut')) || [];
@@ -279,22 +284,26 @@
     
     let dataVis = new Date(), tIn, cron, espR$ = 0, cKM = 0, chartInstance = null;
 
-    // Atualiza relógio
+    // Relógio Topo
     setInterval(() => {
         const now = new Date();
-        document.getElementById('dataTopo').innerText = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR');
+        document.getElementById('clock').innerText = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR');
     }, 1000);
 
     // Helpers
     function parseMoney(v) { return v ? parseFloat(v.toString().replace(',', '.')) : 0; }
-    function toggleElement(id) { const el = document.getElementById(id); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
+    function toggleConfig() { const el = document.getElementById('abaConfigs'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
     
-    function toggleAba(id, btn) { 
-        document.querySelectorAll('.aba-conteudo').forEach(a => a.style.display = 'none'); 
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    // ABA E GRÁFICO (BUG FIX: Timeout para garantir que a div existe antes de renderizar)
+    function abrirAba(id, btn) { 
+        document.querySelectorAll('.area').forEach(a => a.style.display = 'none'); 
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
         document.getElementById(id).style.display = 'block'; 
         btn.classList.add('active');
-        if(id === 'areaGraficos') renderChart(); 
+        
+        if(id === 'areaGraficos') {
+            setTimeout(() => renderChart(), 100); // Pequeno delay para corrigir o flicker
+        }
     }
     
     function mudarMes(d) { dataVis.setMonth(dataVis.getMonth() + d); render(); }
@@ -308,19 +317,50 @@
             pd: parseMoney(document.getElementById('cfgPD').value), 
             pt: parseMoney(document.getElementById('cfgPT').value) 
         };
-        localStorage.setItem('shark_v45_cfg', JSON.stringify(cfg)); render(); alert('Custos Atualizados!');
+        localStorage.setItem('shark_v45_cfg', JSON.stringify(cfg)); render(); alert('Custos Salvos!');
     }
 
-    // Funções de Adição
+    // --- NOVA INTELIGÊNCIA DE MANUTENÇÃO ---
     function addManutencao() {
-        const peca = document.getElementById('manutPeca').value.toUpperCase();
+        const peca = document.getElementById('manutPeca').value.toUpperCase().trim();
         const v = parseMoney(document.getElementById('manutValor').value);
         const k = parseInt(document.getElementById('manutKM').value);
-        if(!peca || !k) return alert('Preencha os dados!');
+        if(!peca || !k) return alert('Preencha peça e KM!');
+
+        // Procura a última troca dessa mesma peça para calcular duração
+        // Filtra todas as manutenções com o mesmo nome (contendo a string)
+        const historicoPeca = manutencao
+            .filter(m => m.peca.includes(peca))
+            .sort((a,b) => b.km - a.km); // Ordena do maior KM para o menor
+        
+        let duracaoInfo = "";
+        let kmDelta = 0;
+        
+        if(historicoPeca.length > 0) {
+            const ultima = historicoPeca[0];
+            kmDelta = k - ultima.km;
+            if(kmDelta > 0) {
+                duracaoInfo = ` (Durou ${kmDelta} KM)`;
+                alert(`Troca Registrada!\nA peça "${peca}" durou ${kmDelta} KM desde a última troca.`);
+            }
+        }
+
         const d = new Date();
-        manutencao.push({ id: Date.now(), peca, valor: v, km: k, data: d.toLocaleDateString('pt-BR'), mes: String(d.getMonth()+1).padStart(2,'0'), ano: d.getFullYear(), tipoItem: 'MANUT' });
+        manutencao.push({ 
+            id: Date.now(), 
+            peca: peca, 
+            valor: v, 
+            km: k, 
+            duracao: kmDelta, // Salva a duração calculada
+            data: d.toLocaleDateString('pt-BR'), 
+            mes: String(d.getMonth()+1).padStart(2,'0'), 
+            ano: d.getFullYear(), 
+            tipoItem: 'MANUT' 
+        });
+        
         localStorage.setItem('shark_v45_manut', JSON.stringify(manutencao));
-        limparInputs(['manutPeca','manutValor','manutKM']); render();
+        document.getElementById('manutPeca').value = ''; document.getElementById('manutValor').value = ''; document.getElementById('manutKM').value = ''; 
+        render();
     }
 
     function addDespesa() {
@@ -329,32 +369,23 @@
             const d = new Date();
             despesas.push({ id: Date.now(), desc: n, valor: v, data: d.toLocaleDateString('pt-BR'), mes: String(d.getMonth()+1).padStart(2,'0'), ano: d.getFullYear(), tipoItem: 'GASTO' }); 
             localStorage.setItem('shark_v45_desp', JSON.stringify(despesas)); 
-            limparInputs(['despNome','despValor']); render(); 
+            document.getElementById('despNome').value = ''; document.getElementById('despValor').value = ''; render(); 
         }
     }
-    
-    function limparInputs(ids) { ids.forEach(id => document.getElementById(id).value = ''); }
 
-    // Lógica da Corrida
+    // Corrida
     function motor() {
         const btn = document.getElementById('btnAcao');
         if (btn.innerText.includes("INICIAR")) {
-            tIn = new Date(); 
-            btn.innerHTML = "🏁 FINALIZAR CORRIDA"; 
-            btn.className = "btn-action btn-stop";
-            document.getElementById('liveMonitor').style.display = 'block'; 
-            document.getElementById('abaAjusteKM').style.display = 'block';
+            tIn = new Date(); btn.innerHTML = "🛑 FINALIZAR"; btn.className = "btn btn-dang";
+            document.getElementById('liveMonitor').style.display = 'block'; document.getElementById('abaAjusteKM').style.display = 'block';
             cron = setInterval(() => {
                 const diff = new Date() - tIn;
                 const h = Math.floor(diff/3600000).toString().padStart(2,'0'), m = Math.floor((diff%3600000)/60000).toString().padStart(2,'0'), s = Math.floor((diff%60000)/1000).toString().padStart(2,'0');
                 document.getElementById('timer').innerText = `${h}:${m}:${s}`;
                 espR$ = Math.floor(diff/60000) >= 15 ? Math.floor(Math.floor(diff/60000)/15)*10 : 0;
             }, 1000);
-        } else { 
-            clearInterval(cron); 
-            btn.style.display = 'none'; 
-            document.getElementById('btnSalvar').style.display = 'flex'; 
-        }
+        } else { clearInterval(cron); btn.style.display = 'none'; document.getElementById('btnSalvar').style.display = 'block'; }
     }
 
     function salvar() {
@@ -362,18 +393,8 @@
         const opt = document.getElementById('selDestino').options[document.getElementById('selDestino').selectedIndex];
         let kmViagem = (modo === 'lanchonete' || modo === 'outros') ? parseMoney(document.getElementById('extK').value) : parseMoney(document.getElementById('ajusteKMFinal').value);
         if (kmViagem === 0 && opt.getAttribute('data-km')) kmViagem = parseFloat(opt.getAttribute('data-km'));
-        
         const now = new Date();
-        let item = { 
-            id: Date.now(), 
-            mes: String(now.getMonth()+1).padStart(2,'0'), 
-            ano: now.getFullYear(), 
-            data: now.toLocaleDateString('pt-BR'), 
-            hora: now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}), 
-            custo: kmViagem * cKM, 
-            km: kmViagem, 
-            tipoItem: 'VIAGEM' 
-        };
+        let item = { id: Date.now(), mes: String(now.getMonth()+1).padStart(2,'0'), ano: now.getFullYear(), data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}), custo: kmViagem * cKM, km: kmViagem, tipoItem: 'VIAGEM' };
         
         if(modo === 'lanchonete' || modo === 'outros') {
             item = { ...item, tipo: 'Extra', local: (modo==='outros'?'Outros':'Lanches'), bruto: parseMoney(document.getElementById('extV').value) };
@@ -385,12 +406,10 @@
             }
             item = { ...item, tipo: 'Hospital', local: opt.text.split(':')[1].trim(), bruto: base + espR$ };
         }
-        registros.push(item); 
-        localStorage.setItem('shark_v45_data', JSON.stringify(registros)); 
-        location.reload();
+        registros.push(item); localStorage.setItem('shark_v45_data', JSON.stringify(registros)); location.reload();
     }
 
-    // Edição e Remoção
+    // Funções Gerais
     function abrirEdicao(id, tipo) {
         const item = (tipo==='VIAGEM' ? registros : (tipo==='GASTO' ? despesas : manutencao)).find(x => x.id === id);
         if(!item) return;
@@ -399,8 +418,8 @@
         document.getElementById('editLocal').value = item.local || item.desc || item.peca;
         document.getElementById('editValor').value = item.bruto || item.valor;
         document.getElementById('editKM').value = item.km || 0;
-        document.getElementById('editKM').parentElement.style.display = (tipo === 'GASTO') ? 'none' : 'block';
-        document.getElementById('modalEdicao').style.display = 'flex';
+        document.getElementById('divEditKM').style.display = (tipo === 'GASTO') ? 'none' : 'block';
+        document.getElementById('modal').style.display = 'flex';
     }
 
     function salvarEdicao() {
@@ -418,31 +437,20 @@
             fecharModal(); render();
         }
     }
-    function fecharModal() { document.getElementById('modalEdicao').style.display = 'none'; }
-    function apagarGeral(id, tipo) { 
-        if(confirm('Tem certeza que deseja apagar?')) { 
-            if(tipo === 'VIAGEM') { registros = registros.filter(r => r.id !== id); localStorage.setItem('shark_v45_data', JSON.stringify(registros)); } 
-            else if(tipo === 'GASTO') { despesas = despesas.filter(d => d.id !== id); localStorage.setItem('shark_v45_desp', JSON.stringify(despesas)); } 
-            else { manutencao = manutencao.filter(m => m.id !== id); localStorage.setItem('shark_v45_manut', JSON.stringify(manutencao)); } 
-            render(); 
-        } 
-    }
+    function fecharModal() { document.getElementById('modal').style.display = 'none'; }
+    function apagarGeral(id, tipo) { if(confirm('Excluir registro?')) { if(tipo === 'VIAGEM') { registros = registros.filter(r => r.id !== id); localStorage.setItem('shark_v45_data', JSON.stringify(registros)); } else if(tipo === 'GASTO') { despesas = despesas.filter(d => d.id !== id); localStorage.setItem('shark_v45_desp', JSON.stringify(despesas)); } else { manutencao = manutencao.filter(m => m.id !== id); localStorage.setItem('shark_v45_manut', JSON.stringify(manutencao)); } render(); } }
 
-    // Backup
-    function exportarBackup() { const data = { registros, despesas, manutencao, cfg }; const a = document.createElement('a'); a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data)); a.download = `SharkLog_Backup_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`; a.click(); }
+    function exportarBackup() { const data = { registros, despesas, manutencao, cfg }; const a = document.createElement('a'); a.href = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data)); a.download = `SharkLog_BKP_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`; a.click(); }
     function importarBackup() { const input = document.createElement('input'); input.type = 'file'; input.onchange = e => { const reader = new FileReader(); reader.onload = ev => { const data = JSON.parse(ev.target.result); localStorage.setItem('shark_v45_data', JSON.stringify(data.registros || [])); localStorage.setItem('shark_v45_desp', JSON.stringify(data.despesas || [])); localStorage.setItem('shark_v45_manut', JSON.stringify(data.manutencao || [])); if(data.cfg) localStorage.setItem('shark_v45_cfg', JSON.stringify(data.cfg)); location.reload(); }; reader.readAsText(e.target.files[0]); }; input.click(); }
 
-    // Renderização
     function render() {
         cKM = (cfg.gas/cfg.cons) + (cfg.oleo/1000) + (cfg.rel/15000) + (cfg.pd/15000) + (cfg.pt/12000);
         document.getElementById('valKM').innerText = "R$ " + cKM.toFixed(2);
+        document.getElementById('cfgGas').value = cfg.gas; document.getElementById('cfgCons').value = cfg.cons; document.getElementById('cfgOleo').value = cfg.oleo; document.getElementById('cfgRel').value = cfg.rel; document.getElementById('cfgPD').value = cfg.pd; document.getElementById('cfgPT').value = cfg.pt;
         
-        document.getElementById('cfgGas').value = cfg.gas; document.getElementById('cfgCons').value = cfg.cons; document.getElementById('cfgOleo').value = cfg.oleo; 
-        document.getElementById('cfgRel').value = cfg.rel; document.getElementById('cfgPD').value = cfg.pd; document.getElementById('cfgPT').value = cfg.pt;
-
         const mIdx = dataVis.getMonth(), aVis = dataVis.getFullYear(), mStr = String(mIdx+1).padStart(2,'0');
         const meses = ["JANEIRO","FEVEREIRO","MARÇO","ABRIL","MAIO","JUNHO","JULHO","AGOSTO","SETEMBRO","OUTUBRO","NOVEMBRO","DEZEMBRO"];
-        document.getElementById('labelMesAno').innerText = `${meses[mIdx]} / ${aVis}`;
+        document.getElementById('labelMesAno').innerText = `${meses[mIdx]} ${aVis}`;
         
         const regsMes = registros.filter(r => r.mes === mStr && r.ano === aVis);
         const despsMes = despesas.filter(d => d.mes === mStr && d.ano === aVis);
@@ -451,17 +459,17 @@
         let recTot = 2000, custoViagem = 0, custoExtras = 0, custoManut = 0, kmTotalMes = 0;
         const tbody = document.getElementById('corpoTabelaApp'); tbody.innerHTML = '';
         
-        let listaGeral = [ 
-            ...regsMes.map(r => ({...r, display: r.local, valor: r.bruto, color: 'var(--accent)', icon: '🏍️'})), 
-            ...despsMes.map(d => ({...d, display: d.desc, valor: d.valor * -1, color: 'var(--danger)', icon: '💸'})), 
-            ...manutMes.map(m => ({...m, display: `MOTO: ${m.peca}`, valor: m.valor * -1, color: 'var(--warn)', icon: '🛠️'})) 
+        let lista = [ 
+            ...regsMes.map(r => ({...r, t1: r.local, t2: (r.km ? r.km+' KM' : ''), v: r.bruto, c: 'var(--primary)', i: '📍'})), 
+            ...despsMes.map(d => ({...d, t1: d.desc, t2: 'Gasto Extra', v: d.valor * -1, c: 'var(--danger)', i: '💸'})), 
+            ...manutMes.map(m => ({...m, t1: `MOTO: ${m.peca}`, t2: (m.duracao ? `Durou: ${m.duracao} KM` : 'Troca de Peça'), v: m.valor * -1, c: 'var(--warn)', i: '🛠️'})) 
         ].sort((a,b) => b.id - a.id);
 
-        listaGeral.forEach(item => { 
+        lista.forEach(item => { 
             tbody.innerHTML += `<tr>
-                <td><span style="font-weight:bold">${item.data.substring(0,5)}</span><br><span style="font-size:10px; color:#94a3b8">${item.hora || ''}</span></td>
-                <td>${item.icon} ${item.display}</td>
-                <td style="color:${item.color}; font-weight:bold;">R$ ${item.valor.toFixed(2)}</td>
+                <td><div style="font-weight:bold; color:white;">${item.t1}</div><div style="font-size:11px; color:#64748b;">${item.data.substring(0,5)} • ${item.t2}</div></td>
+                <td style="text-align:center;">${item.i}</td>
+                <td style="color:${item.c}; font-weight:800;">R$ ${item.v.toFixed(2)}</td>
                 <td style="text-align:right;">
                     <button class="btn-icon" onclick="abrirEdicao(${item.id}, '${item.tipoItem}')">✏️</button>
                     <button class="btn-icon" style="color:var(--danger)" onclick="apagarGeral(${item.id}, '${item.tipoItem}')">🗑️</button>
@@ -471,7 +479,6 @@
 
         regsMes.forEach(r => { recTot += r.bruto; custoViagem += r.custo; kmTotalMes += (r.km || 0); });
         despsMes.forEach(d => custoExtras += d.valor); manutMes.forEach(m => custoManut += m.valor);
-
         document.getElementById('txtReceita').innerText = recTot.toLocaleString('pt-br',{style:'currency',currency:'BRL'});
         document.getElementById('txtCustos').innerText = (custoViagem + custoExtras + custoManut).toLocaleString('pt-br',{style:'currency',currency:'BRL'});
         document.getElementById('txtKMMes').innerText = kmTotalMes.toFixed(1) + " KM";
@@ -480,7 +487,10 @@
     }
 
     function renderChart() {
-        const ctx = document.getElementById('graficoLucro').getContext('2d');
+        const ctx = document.getElementById('graficoLucro');
+        if(!ctx) return; 
+        if(chartInstance) chartInstance.destroy(); // Limpa anterior para não piscar
+        
         let labels = [], dL = [], dC = [];
         for(let i=4; i>=0; i--) {
             let d = new Date(); d.setMonth(d.getMonth() - i);
@@ -491,87 +501,47 @@
             rM.forEach(r => { tr += r.bruto; tc += r.custo; }); dM.forEach(dm => tc += dm.valor); mM.forEach(mn => tc += mn.valor);
             dL.push(tr - tc); dC.push(tc);
         }
-        if(chartInstance) chartInstance.destroy();
-        chartInstance = new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: 'Lucro', data: dL, backgroundColor: '#10b981', borderRadius:5 }, { label: 'Custos', data: dC, backgroundColor: '#ef4444', borderRadius:5 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: 'white' } } }, scales: { y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }, x: { ticks: { color: '#94a3b8' } } } } });
+        
+        chartInstance = new Chart(ctx.getContext('2d'), { 
+            type: 'bar', 
+            data: { labels, datasets: [{ label: 'Lucro Líquido', data: dL, backgroundColor: '#34d399', borderRadius:6 }, { label: 'Custos Totais', data: dC, backgroundColor: '#f87171', borderRadius:6 }] }, 
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                plugins: { legend: { labels: { color: '#94a3b8' } } }, 
+                scales: { y: { ticks: { color: '#64748b' }, grid: { color: '#334155' } }, x: { ticks: { color: '#64748b' }, grid: { display: false } } } 
+            } 
+        });
     }
 
-    // --- CSV COM DESIGN IDÊNTICO AO DOCX ---
     function baixarCSV(conteudo, nomeArquivo) {
         const blob = new Blob(["\uFEFF" + conteudo], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = nomeArquivo;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = nomeArquivo;
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
-
+    
     function gerarCSVHospital() {
         const mIdx = dataVis.getMonth(), aVis = dataVis.getFullYear(), mStr = String(mIdx+1).padStart(2,'0');
         const mesesNomes = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-        
-        // Dados agrupados
         const vHosp = registros.filter(r => r.tipo === 'Hospital' && r.mes === mStr && r.ano === aVis);
         const agrupado = { "Contrato Fixo Mensal": { qtd: 1, valor: 2000 } };
-        vHosp.forEach(v => { 
-            if (!agrupado[v.local]) agrupado[v.local] = { qtd: 0, valor: 0 }; 
-            agrupado[v.local].qtd++; 
-            agrupado[v.local].valor += v.bruto; 
-        });
-
-        // CONSTRUÇÃO DO CSV BASEADO NO DOCX (Source 1, 2, 3, 4)
-        let csv = "";
-        // Header (Source 1)
-        csv += `Relatório Mensal Entregas e Coletas Mês ${mStr}/${aVis}\n\n`;
-        
-        // Info Contrato (Source 2)
-        csv += `Contratada: Sharklog Entregas Expressas;;Contratante: REDEH Cristã\n`;
-        csv += `Período: ${mesesNomes[mIdx]}/${aVis}\n\n`;
-        
-        // Tabela (Source 3)
-        csv += `Detalhamento\n`;
-        csv += `Destino;Quantidade;Valor\n`;
-        
-        let totalQtd = 0;
-        let totalVal = 0;
-
-        for (let destino in agrupado) {
-            totalQtd += agrupado[destino].qtd;
-            totalVal += agrupado[destino].valor;
-            // Adiciona * no Itapema/Itajai como no modelo se necessario, ou deixa limpo
-            let nomeDestino = destino;
-            csv += `${nomeDestino};${agrupado[destino].qtd};R$ ${agrupado[destino].valor.toFixed(2).replace('.',',')}\n`;
-        }
-        
-        // Totais (Source 3)
-        csv += `Total;${totalQtd};R$ ${totalVal.toFixed(2).replace('.',',')}\n\n`;
-
-        // Rodapé e Assinatura (Source 4)
-        csv += `\n\n`;
-        csv += `______________________________________\n`;
-        csv += `João Vitor Boa Ventura - Sharklog\n`;
-
+        vHosp.forEach(v => { if (!agrupado[v.local]) agrupado[v.local] = { qtd: 0, valor: 0 }; agrupado[v.local].qtd++; agrupado[v.local].valor += v.bruto; });
+        let csv = `Relatório Mensal Entregas e Coletas Mês ${mStr}/${aVis}\n\nContratada: Sharklog Entregas Expressas;;Contratante: REDEH Cristã\nPeríodo: ${mesesNomes[mIdx]}/${aVis}\n\nDetalhamento\nDestino;Quantidade;Valor\n`;
+        let tQ = 0, tV = 0;
+        for (let d in agrupado) { tQ+=agrupado[d].qtd; tV += agrupado[d].valor; csv += `${d};${agrupado[d].qtd};R$ ${agrupado[d].valor.toFixed(2).replace('.',',')}\n`; }
+        csv += `Total;${tQ};R$ ${tV.toFixed(2).replace('.',',')}\n\n\n______________________________________\nJoão Vitor Boa Ventura - Sharklog`;
         baixarCSV(csv, `Relatorio_Hospital_${mesesNomes[mIdx]}.csv`);
     }
 
     function gerarCSVContabil() {
         const mIdx = dataVis.getMonth(), aVis = dataVis.getFullYear(), mStr = String(mIdx+1).padStart(2,'0');
         const todos = [ ...registros.filter(r => r.mes === mStr && r.ano === aVis), ...despesas.filter(d => d.mes === mStr && d.ano === aVis).map(d => ({...d, local: d.desc, bruto: 0, custo: d.valor, km: 0, hora: '-'})), ...manutencao.filter(m => m.mes === mStr && m.ano === aVis).map(m => ({...m, local: 'MOTO: '+m.peca, bruto: 0, custo: m.valor, km: 0, hora: '-'})) ].sort((a,b) => a.id - b.id);
-
-        let csv = `CONTROLE FINANCEIRO DETALHADO - ${mStr}/${aVis}\n`;
-        csv += "DATA;HORA;DESCRICAO;KM;RECEITA;CUSTO;LUCRO\n";
-        todos.forEach(item => {
-            const rec = item.bruto || 0; const cus = item.custo || 0;
-            csv += `${item.data};${item.hora||''};${item.local};${(item.km||0).toString().replace('.',',')};${rec.toFixed(2).replace('.',',')};${cus.toFixed(2).replace('.',',')};${(rec-cus).toFixed(2).replace('.',',')}\n`;
-        });
+        let csv = `CONTROLE FINANCEIRO DETALHADO - ${mStr}/${aVis}\nDATA;HORA;DESCRICAO;KM;RECEITA;CUSTO;LUCRO\n`;
+        todos.forEach(i => { csv += `${i.data};${i.hora||''};${i.local};${(i.km||0).toString().replace('.',',')};${(i.bruto||0).toFixed(2).replace('.',',')};${(i.custo||0).toFixed(2).replace('.',',')};${((i.bruto||0)-(i.custo||0)).toFixed(2).replace('.',',')}\n`; });
         baixarCSV(csv, `Contabil_SharkLog_${mStr}.csv`);
     }
 
-    function checkSelecao() { 
-        const v = document.getElementById('selDestino').value; 
-        document.getElementById('abaExtra').style.display = (v === 'lanchonete' || v === 'outros') ? 'block' : 'none'; 
-        if(v!=='lanchonete' && v!=='outros') document.getElementById('ajusteKMFinal').value = document.getElementById('selDestino').options[document.getElementById('selDestino').selectedIndex].getAttribute('data-km'); 
-    }
+    function checkSelecao() { const v = document.getElementById('selDestino').value; document.getElementById('abaExtra').style.display = (v === 'lanchonete' || v === 'outros') ? 'block' : 'none'; if(v!=='lanchonete' && v!=='outros') document.getElementById('ajusteKMFinal').value = document.getElementById('selDestino').options[document.getElementById('selDestino').selectedIndex].getAttribute('data-km'); }
     render();
 </script>
 </body>
