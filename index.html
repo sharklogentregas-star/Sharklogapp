@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sharklog App v55</title>
+    <title>Sharklog Pro v58</title>
     
     <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,6 +13,8 @@
     <link rel="icon" type="image/jpeg" href="https://i.imgur.com/ryw3NT7.jpeg">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
     <style>
@@ -28,26 +30,23 @@
         body { background-color: var(--bg-body); color: var(--text-main); margin: 0; padding: 15px; min-height: 100vh; font-size: 14px; }
         .container { max-width: 600px; margin: 0 auto; padding-bottom: 100px; }
 
-        /* HEADER & NAV */
         .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
         .header h1 { margin: 0; font-size: 20px; font-weight: 900; background: linear-gradient(90deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .logo-img { width: 45px; height: 45px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.1); }
+        
         .date-nav { display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 10px; border-radius: 16px; margin-bottom: 20px; border: var(--border); }
         .nav-btn { background: none; border: none; color: var(--primary); font-size: 22px; cursor: pointer; }
 
-        /* KPI */
         .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border-radius: var(--radius); border: var(--border); padding: 16px; }
+        .card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border-radius: var(--radius); border: var(--border); padding: 16px; position: relative; }
         .kpi-title { font-size: 10px; text-transform: uppercase; color: var(--text-sec); font-weight: 700; margin-bottom: 5px; }
         .kpi-val { font-size: 18px; font-weight: 800; color: #fff; }
         .card.full { grid-column: span 2; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 78, 59, 0.3)); border-color: rgba(16, 185, 129, 0.3); }
 
-        /* TABS */
         .tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; }
         .tab-btn { flex: 1; background: var(--surface); color: var(--text-sec); border: var(--border); padding: 12px; border-radius: 14px; font-weight: 700; font-size: 11px; white-space: nowrap; cursor: pointer; }
         .tab-btn.active { background: var(--primary); color: #000; }
 
-        /* FORMS */
         label { display: block; font-size: 11px; color: var(--primary); font-weight: 700; margin-bottom: 6px; text-transform: uppercase; }
         input, select, textarea { width: 100%; background: #0f172a; border: 1px solid #334155; padding: 14px; border-radius: 14px; color: white; font-size: 15px; margin-bottom: 10px; }
         
@@ -58,20 +57,22 @@
         .btn-warning { background: var(--warning); color: black; }
         .btn-manual { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
 
-        /* TABLE */
         .table-container { background: var(--surface); border-radius: 18px; border: var(--border); overflow: hidden; margin-top: 20px; }
         .table-scroll { max-height: 350px; overflow-y: auto; }
         table { width: 100%; border-collapse: collapse; }
         td, th { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; text-align: left; }
         th { background: #1e293b; color: var(--text-sec); font-size: 10px; text-transform: uppercase; }
         
-        /* MODAL & AREAS */
         .area { display: none; }
+        .active-area { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
         #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
         .modal-content { background: var(--surface); padding: 25px; border-radius: 24px; width: 100%; max-width: 400px; border: 1px solid var(--primary); }
-        .tag { padding: 5px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; border: none; cursor: pointer; }
+        .tag { padding: 5px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; border: none; cursor: pointer; margin-right: 5px; }
         
         .chart-wrapper { position: relative; height: 300px; width: 100%; }
+        .badge-edit { background: var(--warning); color: black; padding: 2px 8px; border-radius: 4px; font-size: 9px; font-weight: 800; position: absolute; top: 10px; right: 10px; }
     </style>
 </head>
 <body>
@@ -97,16 +98,17 @@
     </div>
 
     <div class="tabs">
-        <button class="tab-btn active" onclick="abrirAba('areaHome', this)">🏠 INÍCIO</button>
+        <button class="tab-btn active" id="tabInício" onclick="abrirAba('areaHome', this)">🏠 INÍCIO</button>
         <button class="tab-btn" onclick="abrirAba('areaGraficos', this)">📊 GRÁFICO</button>
         <button class="tab-btn" onclick="abrirAba('areaDespesas', this)">💸 GASTOS</button>
         <button class="tab-btn" onclick="abrirAba('areaManutencao', this)">🛠️ MOTO</button>
     </div>
 
-    <div id="areaHome" class="area" style="display:block;">
+    <div id="areaHome" class="area active-area">
         <div class="card">
+            <div id="badgeEdit" class="badge-edit" style="display:none;">MODO EDIÇÃO</div>
             <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                <label>NOVA CORRIDA</label>
+                <label id="lblTituloCorrida">NOVA CORRIDA</label>
                 <button onclick="toggleConfig()" style="background:none; border:none; font-size:20px; cursor:pointer;">⚙️</button>
             </div>
             
@@ -141,16 +143,16 @@
             </div>
 
             <div id="painelFinalizacao" style="display:none; margin-top:15px; background:var(--surface); padding:15px; border-radius:15px; border:1px solid var(--success);">
-                <h4 style="margin:0 0 10px 0; color:var(--success); text-align:center;">CONFIRMAR DADOS</h4>
+                <h4 id="titFinaliza" style="margin:0 0 10px 0; color:var(--success); text-align:center;">CONFIRMAR DADOS</h4>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                     <div><label>Data</label><input type="date" id="inputDataManual"></div>
                     <div><label>Hora</label><input type="time" id="inputHoraManual"></div>
                 </div>
-                <div id="divAjusteKM">
+                <div>
                     <label style="color:var(--warning);">KM REAL DA VIAGEM</label>
                     <input type="number" id="ajusteKMFinal">
                 </div>
-                <button onclick="salvar()" class="btn btn-success">💾 SALVAR TUDO</button>
+                <button id="btnSalvarPrincipal" onclick="salvar()" class="btn btn-success">💾 SALVAR</button>
                 <button onclick="cancelarLancamento()" class="btn" style="background:#334155; margin-top:10px;">CANCELAR</button>
             </div>
             
@@ -170,10 +172,10 @@
 
     <div id="areaGraficos" class="area"><div class="card"><div class="chart-wrapper"><canvas id="graficoLucro"></canvas></div></div></div>
     <div id="areaDespesas" class="area"><div class="card" style="border-color:var(--danger);"><label style="color:var(--danger)">NOVO GASTO</label><input type="text" id="despNome" placeholder="Descrição"><input type="text" id="despValor" placeholder="Valor R$"><button onclick="addDespesa()" class="btn btn-danger">SALVAR GASTO</button></div></div>
-    <div id="areaManutencao" class="area"><div class="card" style="border-color:var(--warning);"><label style="color:var(--warning)">MANUTENÇÃO</label><input type="text" id="manutPeca" placeholder="Peça"><input type="number" id="manutKM" placeholder="KM Atual"><input type="text" id="manutValor" placeholder="R$"><button onclick="addManutencao()" class="btn btn-warning">SALVAR</button></div></div>
+    <div id="areaManutencao" class="area"><div class="card" style="border-color:var(--warning);"><label style="color:var(--warning)">MANUTENÇÃO</label><input type="text" id="manutPeca" placeholder="Peça"><input type="text" id="manutMarca" placeholder="Marca"><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><input type="text" id="manutValor" placeholder="R$"><input type="number" id="manutKM" placeholder="KM Atual"></div><textarea id="manutObs" placeholder="Obs..."></textarea><button onclick="addManutencao()" class="btn btn-warning">SALVAR</button></div></div>
 
     <div class="table-container">
-        <div class="tags-container">
+        <div class="tags-container" style="padding:10px; display:flex; gap:10px;">
             <button class="tag" style="background:#334155; color:white;" onclick="filtrarTabela('todos')">TUDO</button>
             <button class="tag" style="background:rgba(96, 165, 250, 0.2); color:#60a5fa;" onclick="filtrarTabela('Hospital')">HOSP</button>
             <button class="tag" style="background:rgba(251, 146, 60, 0.2); color:#fb923c;" onclick="filtrarTabela('Lanches')">LANCHE</button>
@@ -183,9 +185,9 @@
     </div>
 
     <div class="card" style="margin-top:20px;">
-        <label>RELATÓRIOS E BACKUP</label>
-        <button class="btn btn-success" onclick="gerarCSVHospital()">📄 HOSPITAL (12-12)</button>
-        <button class="btn btn-primary" onclick="gerarCSVContabil()">📈 GERAL MENSAL</button>
+        <label>RELATÓRIOS E BACKUP (EXCEL)</label>
+        <button class="btn btn-success" onclick="gerarXLSXHospital()">📊 RELATÓRIO HOSPITAL (XLSX)</button>
+        <button class="btn btn-primary" onclick="gerarXLSXGeral()" style="margin-top:10px;">📈 RELATÓRIO GERAL (XLSX)</button>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
             <button class="btn" style="background:#334155;" onclick="exportarBackup()">⬇️ EXPORTAR</button>
             <button class="btn" style="background:#334155;" onclick="importarBackup()">⬆️ IMPORTAR</button>
@@ -193,44 +195,49 @@
     </div>
 </div>
 
-<div id="modal"><div class="modal-content"><div id="modalBody"></div><button onclick="apagarRegistroAtual()" class="btn btn-danger" style="margin-top:15px;">🗑️ EXCLUIR REGISTRO</button><button onclick="fecharModal()" class="btn" style="background:#334155; margin-top:10px;">FECHAR</button></div></div>
+<div id="modal"><div class="modal-content">
+    <div id="modalBody"></div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
+        <button onclick="prepararEdicao()" class="btn btn-warning">✏️ EDITAR</button>
+        <button onclick="apagarRegistroAtual()" class="btn btn-danger">🗑️ EXCLUIR</button>
+    </div>
+    <button onclick="fecharModal()" class="btn" style="background:#334155; margin-top:10px;">FECHAR</button>
+</div></div>
 
 <script>
-    const DB_KEY = "SHARKLOG_DATA_V55";
+    const DB_KEY = "SHARKLOG_DATA_V57";
     const SALARIO_BASE = 2000;
+
+    // --- ID GENERATOR ---
+    function gerarID() { return typeof crypto!=='undefined'&&crypto.randomUUID ? crypto.randomUUID() : Date.now() + Math.random().toString(36).substr(2); }
 
     let db = JSON.parse(localStorage.getItem(DB_KEY));
     if(!db) {
-        // TENTA RECUPERAR DE VERSÕES ANTIGAS
-        let old = localStorage.getItem("SHARKLOG_DATA_V54") || localStorage.getItem("SHARKLOG_DATA_V53");
+        let old = localStorage.getItem("SHARKLOG_DATA_V56");
         db = old ? JSON.parse(old) : { registros: [], despesas: [], manutencao: [], cfg: {gas:6.54, cons:35, oleo:45, rel:160, pd:220, pt:290} };
-        
-        // FIX AUTOMATICO: SE TIVER REGISTRO SEM TIPOITEM, DEFINE COMO VIAGEM (CORRIGE BUG HEMOSC)
-        if(db.registros) {
-            db.registros.forEach(r => { if(!r.tipoItem) r.tipoItem = 'VIAGEM'; });
-        }
-        localStorage.setItem(DB_KEY, JSON.stringify(db));
+        if(!db.cfg.oleo) db.cfg.oleo = 45; // safe default
+        saveDB();
     }
 
-    let dataVis = new Date(), tIn, cron, espR$ = 0, cKM = 0, chartInstance = null, filtroAtual = 'todos', idAtual = null, tipoAtual = null;
+    let dataVis = new Date(), tIn, cron, espR$ = 0, cKM = 0, chartInstance = null, filtroAtual = 'todos', idAtual = null, tipoAtual = null, isEditing = false;
 
     setInterval(() => { const now = new Date(); document.getElementById('clock').innerText = now.toLocaleDateString('pt-BR').substring(0,5) + ' ' + now.toLocaleTimeString('pt-BR').substring(0,5); }, 1000);
 
     function saveDB() { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
-    function parseMoney(v) { return v ? parseFloat(v.toString().replace(',', '.')) : 0; }
+    function parseMoney(v) { if(!v) return 0; v=v.toString().replace(/[^\d,.-]/g,'').replace(',','.'); const n=parseFloat(v); return isNaN(n)?0:n; }
     function toggleConfig() { const el = document.getElementById('abaConfigs'); el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
     function mudarMes(d) { dataVis.setMonth(dataVis.getMonth() + d); render(); }
     function fecharModal() { document.getElementById('modal').style.display = 'none'; }
+    
     function abrirAba(id, btn) { 
-        document.querySelectorAll('.area').forEach(a => a.style.display = 'none'); 
+        document.querySelectorAll('.area').forEach(a => { a.style.display = 'none'; a.classList.remove('active-area'); });
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).style.display = 'block'; btn.classList.add('active');
+        const el = document.getElementById(id); el.style.display = 'block'; el.classList.add('active-area'); btn.classList.add('active');
         if(id === 'areaGraficos') setTimeout(renderChart, 100); 
     }
+    
     function filtrarTabela(tipo) { filtroAtual = tipo; render(); }
-    function saveCfg() { db.cfg = { gas: parseMoney(document.getElementById('cfgGas').value), cons: parseMoney(document.getElementById('cfgCons').value)||1, oleo: parseMoney(document.getElementById('cfgOleo').value), rel: parseMoney(document.getElementById('cfgRel').value), pd: parseMoney(document.getElementById('cfgPD').value), pt: parseMoney(document.getElementById('cfgPT').value) }; saveDB(); render(); alert('Salvo!'); }
 
-    // --- LOGICA TIMER E MANUAL ---
     function checkSelecao() {
         const v = document.getElementById('selDestino').value;
         const isExtra = (v === 'lanchonete' || v === 'outros');
@@ -241,13 +248,13 @@
         }
     }
 
+    // --- TIMER & MANUAL ---
     function iniciarTimer() {
-        tIn = new Date();
+        tIn = Date.now();
         document.getElementById('botoesIniciais').style.display = 'none';
         document.getElementById('liveMonitor').style.display = 'block';
-        document.getElementById('painelFinalizacao').style.display = 'none';
         cron = setInterval(() => { 
-            const diff = new Date() - tIn; 
+            const diff = Date.now() - tIn; 
             document.getElementById('timer').innerText = new Date(diff).toISOString().substr(11, 8);
             espR$ = Math.floor(diff/60000) >= 15 ? Math.floor(Math.floor(diff/60000)/15)*10 : 0;
         }, 1000);
@@ -260,19 +267,31 @@
         document.getElementById('liveMonitor').style.display = 'none';
         document.getElementById('botoesIniciais').style.display = 'none';
         document.getElementById('painelFinalizacao').style.display = 'block';
-        const agora = new Date();
-        const offset = agora.getTimezoneOffset() * 60000;
-        const localISOTime = (new Date(agora - offset)).toISOString().slice(0, -1);
-        document.getElementById('inputDataManual').value = localISOTime.split('T')[0];
-        document.getElementById('inputHoraManual').value = localISOTime.split('T')[1].substring(0,5);
+        if(!isEditing) {
+            const agora = new Date();
+            const offset = agora.getTimezoneOffset() * 60000;
+            const localISO = (new Date(agora - offset)).toISOString().slice(0, -1);
+            document.getElementById('inputDataManual').value = localISO.split('T')[0];
+            document.getElementById('inputHoraManual').value = localISO.split('T')[1].substring(0,5);
+        }
     }
 
     function cancelarLancamento() {
+        isEditing = false;
+        document.getElementById('badgeEdit').style.display = 'none';
+        document.getElementById('lblTituloCorrida').innerText = "NOVA CORRIDA";
+        document.getElementById('btnSalvarPrincipal').innerText = "💾 SALVAR";
+        document.getElementById('titFinaliza').innerText = "CONFIRMAR DADOS";
+        document.getElementById('corridaObs').value = "";
+        document.getElementById('extTitulo').value = "";
+        document.getElementById('extV').value = "";
+        document.getElementById('extK').value = "";
         document.getElementById('painelFinalizacao').style.display = 'none';
         document.getElementById('botoesIniciais').style.display = 'block';
         document.getElementById('timer').innerText = "00:00:00";
     }
 
+    // --- SAVE ---
     function salvar() {
         const modo = document.getElementById('selDestino').value;
         const opt = document.getElementById('selDestino').options[document.getElementById('selDestino').selectedIndex];
@@ -283,6 +302,8 @@
         const [ano, mes, dia] = dataManual.split('-');
 
         let kmV = parseMoney(document.getElementById('ajusteKMFinal').value);
+        if(kmV < 0 || kmV > 2000) return alert("KM inválido (Máx 2000 por corrida)!");
+
         let valorBruto = 0, tipo = '', local = '';
 
         if(modo === 'lanchonete' || modo === 'outros') {
@@ -291,13 +312,13 @@
             tipo = (modo==='lanchonete'?'Lanches':'Extra');
             local = document.getElementById('extTitulo').value || tipo;
         } else {
-            valorBruto = parseFloat(opt.getAttribute('data-valor')) + espR$;
+            valorBruto = parseFloat(opt.getAttribute('data-valor')) + (isEditing ? 0 : espR$);
             tipo = 'Hospital';
             local = opt.text.replace('🏥 ', '');
         }
 
         let item = {
-            id: Date.now(),
+            id: isEditing ? idAtual : gerarID(),
             obs: document.getElementById('corridaObs').value,
             mes: mes, ano: parseInt(ano),
             data: `${dia}/${mes}/${ano}`, hora: horaManual,
@@ -305,25 +326,114 @@
             bruto: valorBruto, tipo: tipo, local: local, tipoItem: 'VIAGEM'
         };
 
-        db.registros.push(item);
-        saveDB(); cancelarLancamento(); document.getElementById('corridaObs').value = ""; document.getElementById('extTitulo').value = ""; document.getElementById('extV').value = "";
-        render(); alert("Salvo!");
+        if(isEditing) {
+            const idx = db.registros.findIndex(x => x.id == idAtual);
+            if(idx !== -1) db.registros[idx] = item;
+        } else {
+            db.registros.push(item);
+        }
+
+        saveDB(); cancelarLancamento(); render(); alert(isEditing ? "Atualizado!" : "Salvo!");
     }
 
-    // --- OUTROS ---
     function addDespesa() {
-        const n = document.getElementById('despNome').value, v = parseMoney(document.getElementById('despValor').value);
-        if(n && v) { const d = new Date(); db.despesas.push({ id: Date.now(), desc: n, valor: v, data: d.toLocaleDateString('pt-BR'), mes: String(d.getMonth()+1).padStart(2,'0'), ano: d.getFullYear(), tipoItem: 'GASTO' }); saveDB(); render(); document.getElementById('despNome').value=''; document.getElementById('despValor').value=''; alert('Salvo!'); }
+        const n = document.getElementById('despNome').value;
+        const v = parseMoney(document.getElementById('despValor').value);
+        if(n && v) {
+            const d = new Date();
+            db.despesas.push({ 
+                id: gerarID(), desc: n, valor: v, 
+                data: d.toLocaleDateString('pt-BR'), mes: String(d.getMonth()+1).padStart(2,'0'), ano: d.getFullYear(), tipoItem: 'GASTO' 
+            });
+            saveDB(); render(); 
+            document.getElementById('despNome').value=''; document.getElementById('despValor').value='';
+            alert('Gasto salvo!');
+        }
     }
+
     function addManutencao() {
-        const p = document.getElementById('manutPeca').value, v = parseMoney(document.getElementById('manutValor').value), k = document.getElementById('manutKM').value;
-        if(p && v) { const d = new Date(); db.manutencao.push({ id: Date.now(), peca: p, valor: v, km: k, data: d.toLocaleDateString('pt-BR'), mes: String(d.getMonth()+1).padStart(2,'0'), ano: d.getFullYear(), tipoItem: 'MANUT' }); saveDB(); render(); alert('Salvo!'); }
+        const p = document.getElementById('manutPeca').value;
+        const v = parseMoney(document.getElementById('manutValor').value);
+        const k = document.getElementById('manutKM').value;
+        if(p && v) {
+            const d = new Date();
+            db.manutencao.push({ 
+                id: gerarID(), peca: p, valor: v, km: k, marca: document.getElementById('manutMarca').value,
+                obs: document.getElementById('manutObs').value,
+                data: d.toLocaleDateString('pt-BR'), mes: String(d.getMonth()+1).padStart(2,'0'), ano: d.getFullYear(), tipoItem: 'MANUT' 
+            });
+            saveDB(); render(); alert('Salvo!');
+        }
+    }
+
+    function saveCfg() {
+        db.cfg = { 
+            gas: parseMoney(document.getElementById('cfgGas').value), 
+            cons: parseMoney(document.getElementById('cfgCons').value) || 1, 
+            oleo: parseMoney(document.getElementById('cfgOleo').value), 
+            rel: parseMoney(document.getElementById('cfgRel').value), 
+            pd: parseMoney(document.getElementById('cfgPD').value), 
+            pt: parseMoney(document.getElementById('cfgPT').value) 
+        };
+        saveDB(); render(); alert('Custos atualizados!');
+    }
+
+    // --- EDIT ---
+    function prepararEdicao() {
+        fecharModal();
+        isEditing = true;
+        abrirAba('areaHome', document.getElementById('tabInício'));
+        
+        const lista = (tipoAtual === 'GASTO' ? db.despesas : (tipoAtual === 'MANUT' ? db.manutencao : db.registros));
+        const item = lista.find(x => x.id == idAtual);
+
+        if(!item) return alert("Erro ao carregar item.");
+        if(tipoAtual !== 'VIAGEM') { isEditing = false; return alert("Edição disponível apenas para Corridas."); }
+
+        document.getElementById('badgeEdit').style.display = 'block';
+        document.getElementById('lblTituloCorrida').innerText = "EDITANDO REGISTRO";
+        document.getElementById('btnSalvarPrincipal').innerText = "✅ ATUALIZAR";
+        document.getElementById('titFinaliza').innerText = "ATUALIZAR DADOS";
+
+        const sel = document.getElementById('selDestino');
+        
+        if(item.local.includes("Blumenau")) sel.value = "blumenau";
+        else if(item.local.includes("Itapema")) sel.value = "itapema";
+        else if(item.local.includes("Itajaí")) sel.value = "itajai";
+        else if(item.local.includes("CIS")) sel.value = "cis";
+        else if(item.local.includes("Balneário")) sel.value = "bc";
+        else if(item.tipo === "Lanches") sel.value = "lanchonete";
+        else sel.value = "outros";
+
+        checkSelecao();
+        document.getElementById('corridaObs').value = item.obs || "";
+        document.getElementById('ajusteKMFinal').value = item.km;
+        
+        const [d,m,a] = item.data.split('/');
+        document.getElementById('inputDataManual').value = `${a}-${m}-${d}`;
+        document.getElementById('inputHoraManual').value = item.hora || "00:00";
+        
+        if(sel.value === 'outros' || sel.value === 'lanchonete') {
+            document.getElementById('extTitulo').value = item.local;
+            document.getElementById('extV').value = item.bruto;
+            document.getElementById('extK').value = item.km;
+        }
+        
+        abrirPainelFinalizacao();
     }
 
     // --- RENDER ---
     function render() {
-        cKM = (db.cfg.gas/db.cfg.cons) + (db.cfg.oleo/1000) + (db.cfg.rel/15000) + (db.cfg.pd/15000) + (db.cfg.pt/12000);
-        document.getElementById('cfgGas').value = db.cfg.gas; document.getElementById('cfgCons').value = db.cfg.cons; 
+        if(db.cfg) {
+            document.getElementById('cfgGas').value = db.cfg.gas; 
+            document.getElementById('cfgCons').value = db.cfg.cons; 
+            document.getElementById('cfgOleo').value = db.cfg.oleo;
+            document.getElementById('cfgRel').value = db.cfg.rel;
+            document.getElementById('cfgPD').value = db.cfg.pd;
+            document.getElementById('cfgPT').value = db.cfg.pt;
+        }
+
+        cKM = (db.cfg.gas/ (db.cfg.cons||1)) + (db.cfg.oleo/1000) + (db.cfg.rel/15000) + (db.cfg.pd/15000) + (db.cfg.pt/12000);
         
         const mIdx = dataVis.getMonth(), aVis = dataVis.getFullYear(), mStr = String(mIdx+1).padStart(2,'0');
         document.getElementById('labelMesAno').innerText = `${["JAN","FEV","MAR","ABR","MAI","JUN","JUL","AGO","SET","OUT","NOV","DEZ"][mIdx]} / ${aVis}`;
@@ -338,7 +448,8 @@
             if(r.tipo === 'Hospital') tH += r.bruto; else tO += r.bruto; 
             tC += r.custo; tK += r.km; 
         });
-        dM.forEach(d => tC += d.valor); mM.forEach(m => tC += m.valor);
+        dM.forEach(d => tC += d.valor); 
+        mM.forEach(m => tC += m.valor);
 
         document.getElementById('txtHosp').innerText = tH.toLocaleString('pt-br',{style:'currency',currency:'BRL'});
         document.getElementById('txtOutros').innerText = tO.toLocaleString('pt-br',{style:'currency',currency:'BRL'});
@@ -347,12 +458,22 @@
         document.getElementById('txtLucroReal').innerText = (tH + tO - tC).toLocaleString('pt-br',{style:'currency',currency:'BRL'});
 
         const tbody = document.getElementById('corpoTabelaApp'); tbody.innerHTML = '';
-        let lista = [ ...rM.map(x=>({...x, c:'var(--success)'})), ...dM.map(x=>({...x, local:x.desc, bruto:0, v:x.valor*-1, c:'var(--danger)'})), ...mM.map(x=>({...x, local:x.peca, bruto:0, v:x.valor*-1, c:'var(--warning)'})) ].sort((a,b)=>b.id-a.id);
-        if(filtroAtual !== 'todos') lista = lista.filter(x => x.tipo === filtroAtual);
+        
+        let lista = [ 
+            ...rM.map(x=>({...x, c:'var(--success)', filtroTag: x.tipo})), 
+            ...dM.map(x=>({...x, local:x.desc, bruto:0, valor:x.valor, c:'var(--danger)', filtroTag: 'Gasto'})), 
+            ...mM.map(x=>({...x, local:`MOTO: ${x.peca}`, bruto:0, valor:x.valor, c:'var(--warning)', filtroTag: 'Manut'})) 
+        ].sort((a,b) => (b.id > a.id ? 1 : -1));
+
+        if(filtroAtual !== 'todos') {
+            if(filtroAtual === 'Extra') lista = lista.filter(x => x.filtroTag === 'Extra' || x.filtroTag === 'Lanches');
+            else if(filtroAtual === 'Hospital') lista = lista.filter(x => x.filtroTag === 'Hospital');
+            else if(filtroAtual === 'Lanches') lista = lista.filter(x => x.filtroTag === 'Lanches');
+        }
+        
         lista.forEach(i => {
-            // FIX: Fallback seguro se não tiver tipoItem
-            const tipoSeguro = i.tipoItem || 'VIAGEM';
-            tbody.innerHTML += `<tr onclick="verDetalhes(${i.id}, '${tipoSeguro}')"><td><b>${i.local}</b><br><small style="color:#94a3b8">${i.data} ${i.hora||''}</small></td><td style="text-align:right; color:${i.c}">R$ ${Math.abs(i.bruto || i.valor).toFixed(2)}</td></tr>`;
+            const valorReal = (i.bruto !== undefined) ? i.bruto : i.valor;
+            tbody.innerHTML += `<tr onclick="verDetalhes('${i.id}', '${i.tipoItem || 'VIAGEM'}')"><td><b>${i.local}</b><br><small style="color:#94a3b8">${i.data} ${i.hora||''}</small></td><td style="text-align:right; color:${i.c}">R$ ${Math.abs(valorReal).toFixed(2)}</td></tr>`;
         });
     }
 
@@ -374,39 +495,112 @@
             dL.push(rec - cus); dC.push(cus);
         }
         
-        chartInstance = new Chart(ctx.getContext('2d'), { type: 'bar', data: { labels, datasets: [{ label: 'Lucro', data: dL, backgroundColor: '#10b981', borderRadius:4 }, { label: 'Custos', data: dC, backgroundColor: '#ef4444', borderRadius:4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#94a3b8' } } }, scales: { y: { ticks: { color: '#64748b' }, grid: { color: '#334155' } }, x: { ticks: { color: '#64748b' }, grid: { display: false } } } } });
+        chartInstance = new Chart(ctx.getContext('2d'), { type: 'bar', data: { labels, datasets: [{ label: 'Lucro', data: dL, backgroundColor: '#10b981' }, { label: 'Custos', data: dC, backgroundColor: '#ef4444' }] }, options: { responsive: true, maintainAspectRatio: false } });
     }
 
-    function exportarBackup() { const blob = new Blob([JSON.stringify(db)], { type: 'application/json' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Sharklog_Bkp.json`; a.click(); }
-    function importarBackup() { const input = document.createElement('input'); input.type = 'file'; input.onchange = e => { const r = new FileReader(); r.onload = ev => { try { db = JSON.parse(ev.target.result); saveDB(); location.reload(); } catch(e){ alert("Erro arquivo"); } }; r.readAsText(e.target.files[0]); }; input.click(); }
-    
-    function gerarCSVHospital() {
+    // --- XLSX EXCEL FUNCTIONS ---
+    function criarPlanilhaXLSX(titulo, periodoTexto, linhas) {
+        const wb = XLSX.utils.book_new();
+        const sheetData = [ [titulo], [periodoTexto], [], ["Data", "Hora", "Tipo", "Local", "KM", "Valor Bruto (R$)", "Custo (R$)", "Lucro (R$)", "Observações"], ...linhas ];
+        const ws = XLSX.utils.aoa_to_sheet(sheetData);
+        ws["!merges"] = [ { s: { r: 0, c: 0 }, e: { r: 0, c: 8 } }, { s: { r: 1, c: 0 }, e: { r: 1, c: 8 } } ];
+        ws["!cols"] = [ { wch: 10 }, { wch: 8 }, { wch: 12 }, { wch: 28 }, { wch: 8 }, { wch: 16 }, { wch: 14 }, { wch: 14 }, { wch: 30 } ];
+        XLSX.utils.book_append_sheet(wb, ws, "Relatório");
+        return wb;
+    }
+
+    function gerarXLSXHospital() {
         const mesRef = dataVis.getMonth(), anoRef = dataVis.getFullYear();
-        const dtFim = new Date(anoRef, mesRef, 12, 23, 59, 59); const dtIni = new Date(anoRef, mesRef - 1, 13, 0, 0, 0);
-        const vHosp = db.registros.filter(r => { if(r.tipo !== 'Hospital') return false; const [d,m,a] = r.data.split('/'); const dR = new Date(a, m-1, d); return dR >= dtIni && dR <= dtFim; });
-        const agrupado = { "Contrato Fixo Mensal": { qtd: 1, valor: 2000 } }; vHosp.forEach(v => { if (!agrupado[v.local]) agrupado[v.local] = { qtd: 0, valor: 0 }; agrupado[v.local].qtd++; agrupado[v.local].valor += v.bruto; });
-        let csv = `Relatorio Hospital\nDestino;Qtd;Valor\n`; let tQ = 0, tV = 0; for (let d in agrupado) { tQ+=agrupado[d].qtd; tV += agrupado[d].valor; csv += `${d};${agrupado[d].qtd};${agrupado[d].valor.toFixed(2).replace('.',',')}\n`; } csv += `Total;${tQ};${tV.toFixed(2).replace('.',',')}`; const b = new Blob(["\uFEFF"+csv],{type:'text/csv;charset=utf-8;'}); const l = document.createElement("a"); l.href = URL.createObjectURL(b); l.download = "Hospital.csv"; document.body.appendChild(l); l.click(); document.body.removeChild(l);
+        // Ciclo 12-12
+        const inicio = new Date(anoRef, mesRef - 1, 13);
+        const fim = new Date(anoRef, mesRef, 12, 23, 59, 59);
+
+        let linhas = [], tBruto = 0, tCusto = 0, tLucro = 0;
+
+        db.registros.filter(r => {
+            if (r.tipo !== "Hospital") return false;
+            const [dia, mes, ano] = r.data.split('/');
+            const d = new Date(ano, mes - 1, dia);
+            return d >= inicio && d <= fim;
+        }).forEach(r => {
+            const lucro = r.bruto - r.custo;
+            tBruto += r.bruto; tCusto += r.custo; tLucro += lucro;
+            linhas.push([ r.data, r.hora || "", r.tipo, r.local, r.km, r.bruto, r.custo, lucro, r.obs || "" ]);
+        });
+
+        linhas.push([]); linhas.push([ "TOTAL", "", "", "", "", tBruto, tCusto, tLucro, "" ]);
+        const wb = criarPlanilhaXLSX("RELATÓRIO HOSPITAL - SHARKLOG", `Período: ${inicio.toLocaleDateString('pt-BR')} até ${fim.toLocaleDateString('pt-BR')}`, linhas);
+        XLSX.writeFile(wb, "Relatorio_Hospital_12a12.xlsx");
+    }
+
+    function gerarXLSXGeral() {
+        const mStr = String(dataVis.getMonth()+1).padStart(2,'0'), aVis = dataVis.getFullYear();
+        let linhas = [], tBruto = 0, tCusto = 0, tLucro = 0;
+
+        // Viagens
+        db.registros.filter(r => r.mes === mStr && r.ano === aVis).forEach(r => {
+            const lucro = r.bruto - r.custo;
+            tBruto += r.bruto; tCusto += r.custo; tLucro += lucro;
+            linhas.push([ r.data, r.hora || "", r.tipo, r.local, r.km, r.bruto, r.custo, lucro, r.obs || "" ]);
+        });
+
+        // Despesas (Custo Positivo para somar no total de custos)
+        db.despesas.filter(d => d.mes === mStr && d.ano === aVis).forEach(d => {
+            tCusto += d.valor; tLucro -= d.valor;
+            linhas.push([ d.data, "", "Gasto", d.desc, "", 0, d.valor, -d.valor, d.obs || "" ]);
+        });
+
+        // Manutencao
+        db.manutencao.filter(m => m.mes === mStr && m.ano === aVis).forEach(m => {
+            tCusto += m.valor; tLucro -= m.valor;
+            linhas.push([ m.data, "", "Manutencao", m.peca, m.km, 0, m.valor, -m.valor, m.obs || "" ]);
+        });
+
+        linhas.push([]); linhas.push([ "TOTAL GERAL", "", "", "", "", tBruto, tCusto, tLucro, "" ]);
+        const wb = criarPlanilhaXLSX("RELATÓRIO GERAL MENSAL - SHARKLOG", `Mês: ${mStr}/${aVis}`, linhas);
+        XLSX.writeFile(wb, `Relatorio_Geral_${mStr}.xlsx`);
+    }
+
+    function exportarBackup() { 
+        const blob = new Blob([JSON.stringify(db)], { type: 'application/json' }); 
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); 
+        a.download = `Sharklog_Bkp_${new Date().toISOString().split('T')[0]}.json`; a.click(); 
     }
     
-    function gerarCSVContabil() { const mStr = String(dataVis.getMonth()+1).padStart(2,'0'), aVis = dataVis.getFullYear(); const todos = [ ...db.registros.filter(r => r.mes === mStr && r.ano === aVis), ...db.despesas.filter(d => d.mes === mStr && d.ano === aVis).map(d => ({...d, local: d.desc, bruto: 0, custo: d.valor, km: 0})), ...db.manutencao.filter(m => m.mes === mStr && m.ano === aVis).map(m => ({...m, local: 'MOTO: '+m.peca, bruto: 0, custo: m.valor, km: 0})) ].sort((a,b) => a.id - b.id); let csv = `Geral\nDATA;OBS;DESCRICAO;KM;RECEITA;CUSTO;LUCRO\n`; todos.forEach(i => { csv += `${i.data};${i.obs||''};${i.local};${(i.km||0).toString().replace('.',',')};${(i.bruto||0).toFixed(2).replace('.',',')};${(i.custo||0).toFixed(2).replace('.',',')};${((i.bruto||0)-(i.custo||0)).toFixed(2).replace('.',',')}\n`; }); const b = new Blob(["\uFEFF"+csv],{type:'text/csv;charset=utf-8;'}); const l = document.createElement("a"); l.href = URL.createObjectURL(b); l.download = "Geral.csv"; document.body.appendChild(l); l.click(); document.body.removeChild(l); }
+    function importarBackup() { 
+        const input = document.createElement('input'); input.type = 'file'; 
+        input.onchange = e => { 
+            const r = new FileReader(); 
+            r.onload = ev => { 
+                try { 
+                    const d = JSON.parse(ev.target.result); 
+                    if(d.registros && Array.isArray(d.registros)) { db = d; saveDB(); location.reload(); }
+                    else alert("Backup inválido"); 
+                } catch(e){ alert("Erro ao ler arquivo"); } 
+            }; 
+            r.readAsText(e.target.files[0]); 
+        }; 
+        input.click(); 
+    }
 
     function verDetalhes(id, tipo) { 
         idAtual = id; tipoAtual = tipo; 
-        // CORREÇÃO: Fallback se tipo vier undefined
         const lista = (tipo === 'GASTO' ? db.despesas : (tipo === 'MANUT' ? db.manutencao : db.registros));
-        const item = lista.find(x => x.id === id);
+        const item = lista.find(x => x.id == id); // == para suportar string/num
+        if(!item) return;
         
-        if(!item) return alert("Item não encontrado!");
-
-        let h = `<p><b>Data:</b> ${item.data} ${item.hora||''}</p><p><b>Local:</b> ${item.local || item.peca || item.desc}</p><p><b>Valor:</b> R$ ${(item.bruto || item.valor).toFixed(2)}</p>`;
-        if(item.obs) h += `<p><b>Obs:</b> ${item.obs}</p>`;
+        let h = `<h3 style="color:var(--primary); margin:0;">${item.local || item.peca || item.desc}</h3>
+                 <p><b>Data:</b> ${item.data} ${item.hora||''}</p>
+                 <p><b>Valor:</b> R$ ${(item.bruto !== undefined ? item.bruto : item.valor).toFixed(2)}</p>`;
+        if(item.km) h += `<p><b>KM:</b> ${item.km}</p>`;
+        if(item.obs) h += `<p style="color:#ccc; border-top:1px solid #333; padding-top:5px;"><b>Obs:</b> ${item.obs}</p>`;
+        
         document.getElementById('modalBody').innerHTML = h; 
         document.getElementById('modal').style.display = 'flex'; 
     }
 
     function apagarRegistroAtual() { 
         if(confirm('Excluir permanentemente?')) { 
-            // Comparação '!=' (fraca) resolve problema de ID string vs number
             if(tipoAtual==='VIAGEM' || tipoAtual === 'Hospital' || tipoAtual === 'Lanches' || tipoAtual === 'Extra') db.registros = db.registros.filter(x=>x.id != idAtual); 
             else if(tipoAtual==='GASTO') db.despesas = db.despesas.filter(x=>x.id != idAtual); 
             else db.manutencao = db.manutencao.filter(x=>x.id != idAtual); 
